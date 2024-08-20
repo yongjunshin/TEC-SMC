@@ -4,6 +4,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
+import time
 
 
 class MyLidarLocalization(Node):
@@ -18,19 +19,30 @@ class MyLidarLocalization(Node):
             qos_profile)
 
         self.localization_output_publisher = self.create_publisher(String, '/my_lidar_localization_output', qos_profile)
-        self.timer = self.create_timer(1, self.publish_lidar_localization_output_msg)
+        # self.timer = self.create_timer(1, self.publish_lidar_localization_output_msg)
+
+        self.get_logger().info('Subscribe state (start)')
 
 
-    
     def subscribe_lidar_message(self, msg):
         self.get_logger().info('Received lidar scan header: {0}'.format(msg.header))
+        self.get_logger().info('Subscribe state (end)')
+        self.publish_lidar_localization_output_msg()
 
 
     def publish_lidar_localization_output_msg(self):
+        self.get_logger().info('Processing state (start)')
+        time.sleep(3)
         msg = String()
         msg.data = 'Lidar localization output ({0})'.format(Clock().now())
+        self.get_logger().info('Processing state (end)')
+        
+        
+        self.get_logger().info('Publish state (start)')
         self.localization_output_publisher.publish(msg)
-        self.get_logger().info('Published message: {0}'.format(msg.data))
+        self.get_logger().info('Publish state (end)')
+
+        self.get_logger().info('Subscribe state (start)')
 
 
 def main(args=None):
