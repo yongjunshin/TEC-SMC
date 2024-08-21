@@ -5,6 +5,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from rclpy.callback_groups import ReentrantCallbackGroup
 from ros_node_interface.srv import EmergencyControl
+import time
 
 
 class MyControl(Node):
@@ -47,14 +48,35 @@ class MyControl(Node):
 
 
     def set_my_parameters(self):
+        self.declare_parameter('control_split')
         self.declare_parameter('control_proc_time_mean')
         self.declare_parameter('control_proc_time_std')
+        self.declare_parameter('control_pre_time_mean')
+        self.declare_parameter('control_pre_time_std')
+        self.declare_parameter('control_wait_time_mean')
+        self.declare_parameter('control_wait_time_std')
+        self.declare_parameter('control_post_time_mean')   
+        self.declare_parameter('control_post_time_std')
 
+        self.control_split = self.get_parameter('control_split').value
         self.control_proc_time_mean = self.get_parameter('control_proc_time_mean').value
         self.control_proc_time_std = self.get_parameter('control_proc_time_std').value
+        self.control_pre_time_mean = self.get_parameter('control_pre_time_mean').value
+        self.control_pre_time_std = self.get_parameter('control_pre_time_std').value
+        self.control_wait_time_mean = self.get_parameter('control_wait_time_mean').value
+        self.control_wait_time_std = self.get_parameter('control_wait_time_std').value
+        self.control_post_time_mean = self.get_parameter('control_post_time_mean').value
+        self.control_post_time_std = self.get_parameter('control_post_time_std').value
 
+        self.get_logger().info('[PARAM] control_split: {0}'.format(self.control_split))
         self.get_logger().info('[PARAM] control_proc_time_mean: {0}'.format(self.control_proc_time_mean))
         self.get_logger().info('[PARAM] control_proc_time_std: {0}'.format(self.control_proc_time_std))
+        self.get_logger().info('[PARAM] control_pre_time_mean: {0}'.format(self.control_pre_time_mean))
+        self.get_logger().info('[PARAM] control_pre_time_std: {0}'.format(self.control_pre_time_std))
+        self.get_logger().info('[PARAM] control_wait_time_mean: {0}'.format(self.control_wait_time_mean))
+        self.get_logger().info('[PARAM] control_wait_time_std: {0}'.format(self.control_wait_time_std))
+        self.get_logger().info('[PARAM] control_post_time_mean: {0}'.format(self.control_post_time_mean))
+        self.get_logger().info('[PARAM] control_post_time_std: {0}'.format(self.control_post_time_std))
 
 
     def subscribe_localization_message(self, msg):
@@ -85,20 +107,42 @@ class MyControl(Node):
 
     def publish_control_msg(self):
         self.get_logger().info('Subscribe state (end)')
-        self.get_logger().info('Processing state (start)')
 
-        msg = Twist()
-        if self.emergency:
-            msg.linear.x = 0.0
-            msg.angular.z = 0.0
+        if self.control_split == 0:
+            self.get_logger().info('Processing state (start)')
+            time.sleep(3)
+            msg = Twist()
+            if self.emergency:
+                msg.linear.x = 0.0
+                msg.angular.z = 0.0
+            else:
+                msg.linear.x = 0.0
+                msg.angular.z = 1.0
+            self.get_logger().info('Processing state (end)')
         else:
-            msg.linear.x = 0.0
-            msg.angular.z = 1.0
+            self.get_logger().info('PreProcessing state (start)')
+            time.sleep(3)
+            self.get_logger().info('PreProcessing state (end)')
 
-        self.twist_publisher.publish(msg)
-        # self.get_logger().info('Published control message: [linear.x:{0}, angular.z:{1}]'.format(msg.linear.x, msg.angular.z))
+            self.get_logger().info('Wait state (start)')
+            time.sleep(3)
+            self.get_logger().info('Wait state (end)')
+
+            self.get_logger().info('PostProcessing state (start)')
+            time.sleep(3)
+            msg = Twist()
+            if self.emergency:
+                msg.linear.x = 0.0
+                msg.angular.z = 0.0
+            else:
+                msg.linear.x = 0.0
+                msg.angular.z = 1.0
+            self.get_logger().info('PostProcessing state (end)')
         
-        self.get_logger().info('Processing state (end)')
+        self.get_logger().info('Publish state (start)')
+        self.twist_publisher.publish(msg)
+        self.get_logger().info('Publish state (end)')
+
         self.get_logger().info('Subscribe state (start)')
 
 

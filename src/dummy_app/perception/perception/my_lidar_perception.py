@@ -36,14 +36,35 @@ class MyLidarPerception(Node):
 
 
     def set_my_parameters(self):
+        self.declare_parameter('perception_split')
         self.declare_parameter('perception_proc_time_mean')
         self.declare_parameter('perception_proc_time_std')
+        self.declare_parameter('perception_pre_time_mean')
+        self.declare_parameter('perception_pre_time_std')
+        self.declare_parameter('perception_wait_time_mean')
+        self.declare_parameter('perception_wait_time_std')
+        self.declare_parameter('perception_post_time_mean')   
+        self.declare_parameter('perception_post_time_std')
 
+        self.perception_split = self.get_parameter('perception_split').value
         self.perception_proc_time_mean = self.get_parameter('perception_proc_time_mean').value
         self.perception_proc_time_std = self.get_parameter('perception_proc_time_std').value
+        self.perception_pre_time_mean = self.get_parameter('perception_pre_time_mean').value
+        self.perception_pre_time_std = self.get_parameter('perception_pre_time_std').value
+        self.perception_wait_time_mean = self.get_parameter('perception_wait_time_mean').value
+        self.perception_wait_time_std = self.get_parameter('perception_wait_time_std').value
+        self.perception_post_time_mean = self.get_parameter('perception_post_time_mean').value
+        self.perception_post_time_std = self.get_parameter('perception_post_time_std').value
 
+        self.get_logger().info('[PARAM] perception_split: {0}'.format(self.perception_split))
         self.get_logger().info('[PARAM] perception_proc_time_mean: {0}'.format(self.perception_proc_time_mean))
         self.get_logger().info('[PARAM] perception_proc_time_std: {0}'.format(self.perception_proc_time_std))
+        self.get_logger().info('[PARAM] perception_pre_time_mean: {0}'.format(self.perception_pre_time_mean))
+        self.get_logger().info('[PARAM] perception_pre_time_std: {0}'.format(self.perception_pre_time_std))
+        self.get_logger().info('[PARAM] perception_wait_time_mean: {0}'.format(self.perception_wait_time_mean))
+        self.get_logger().info('[PARAM] perception_wait_time_std: {0}'.format(self.perception_wait_time_std))
+        self.get_logger().info('[PARAM] perception_post_time_mean: {0}'.format(self.perception_post_time_mean))
+        self.get_logger().info('[PARAM] perception_post_time_std: {0}'.format(self.perception_post_time_std))
 
     
     def subscribe_lidar_message(self, msg):
@@ -62,19 +83,34 @@ class MyLidarPerception(Node):
             self.publish_lidar_perception_output_msg()
 
             
-
-
     def publish_lidar_perception_output_msg(self):
         self.get_logger().info('Subscribe state (end)')
-        self.get_logger().info('Processing state (start)')
-        time.sleep(3)
 
-        msg = String()
-        msg.data = 'Lidar perception output ({0})'.format(Clock().now())
+        if self.perception_split == 0:
+            self.get_logger().info('Processing state (start)')
+            time.sleep(3)
+            msg = String()
+            msg.data = 'Lidar perception output ({0})'.format(Clock().now())
+            self.get_logger().info('Processing state (end)')
+        else:
+            self.get_logger().info('PreProcessing state (start)')
+            time.sleep(3)
+            self.get_logger().info('PreProcessing state (end)')
+
+            self.get_logger().info('Wait state (start)')
+            time.sleep(3)
+            self.get_logger().info('Wait state (end)')
+
+            self.get_logger().info('PostProcessing state (start)')
+            time.sleep(3)
+            msg = String()
+            msg.data = 'Lidar perception output ({0})'.format(Clock().now())
+            self.get_logger().info('PostProcessing state (end)')
+
+        self.get_logger().info('Publish state (start)')
         self.peception_output_publisher.publish(msg)
-        # self.get_logger().info('Published message: {0}'.format(msg.data))
+        self.get_logger().info('Publish state (end)')
 
-        self.get_logger().info('Processing state (end)')   
         self.get_logger().info('Subscribe state (start)')
 
 def main(args=None):

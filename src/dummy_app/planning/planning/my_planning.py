@@ -54,14 +54,35 @@ class MyPlanning(Node):
 
 
     def set_my_parameters(self):
+        self.declare_parameter('planning_split')
         self.declare_parameter('planning_proc_time_mean')
         self.declare_parameter('planning_proc_time_std')
+        self.declare_parameter('planning_pre_time_mean')
+        self.declare_parameter('planning_pre_time_std')
+        self.declare_parameter('planning_wait_time_mean')
+        self.declare_parameter('planning_wait_time_std')
+        self.declare_parameter('planning_post_time_mean')   
+        self.declare_parameter('planning_post_time_std')
 
+        self.planning_split = self.get_parameter('planning_split').value
         self.planning_proc_time_mean = self.get_parameter('planning_proc_time_mean').value
         self.planning_proc_time_std = self.get_parameter('planning_proc_time_std').value
+        self.planning_pre_time_mean = self.get_parameter('planning_pre_time_mean').value
+        self.planning_pre_time_std = self.get_parameter('planning_pre_time_std').value
+        self.planning_wait_time_mean = self.get_parameter('planning_wait_time_mean').value
+        self.planning_wait_time_std = self.get_parameter('planning_wait_time_std').value
+        self.planning_post_time_mean = self.get_parameter('planning_post_time_mean').value
+        self.planning_post_time_std = self.get_parameter('planning_post_time_std').value
 
+        self.get_logger().info('[PARAM] planning_split: {0}'.format(self.planning_split))
         self.get_logger().info('[PARAM] planning_proc_time_mean: {0}'.format(self.planning_proc_time_mean))
         self.get_logger().info('[PARAM] planning_proc_time_std: {0}'.format(self.planning_proc_time_std))
+        self.get_logger().info('[PARAM] planning_pre_time_mean: {0}'.format(self.planning_pre_time_mean))
+        self.get_logger().info('[PARAM] planning_pre_time_std: {0}'.format(self.planning_pre_time_std))
+        self.get_logger().info('[PARAM] planning_wait_time_mean: {0}'.format(self.planning_wait_time_mean))
+        self.get_logger().info('[PARAM] planning_wait_time_std: {0}'.format(self.planning_wait_time_std))
+        self.get_logger().info('[PARAM] planning_post_time_mean: {0}'.format(self.planning_post_time_mean))
+        self.get_logger().info('[PARAM] planning_post_time_std: {0}'.format(self.planning_post_time_std))
 
 
 
@@ -106,15 +127,35 @@ class MyPlanning(Node):
     #     return result       # Return action result
 
     def publish_trajectory_msg(self):
-
         self.get_logger().info('Subscribe state (end)')
-        self.get_logger().info('Processing state (start)')
-        msg = String()
-        msg.data = 'Planned trajectory ({0})'.format(Clock().now())
+
+        if self.planning_split == 0:
+            self.get_logger().info('Processing state (start)')
+            time.sleep(3)
+            msg = String()
+            msg.data = 'Planned trajectory ({0})'.format(Clock().now())
+            self.get_logger().info('Processing state (end)')
+        else:
+            self.get_logger().info('PreProcessing state (start)')
+            time.sleep(3)
+            self.get_logger().info('PreProcessing state (end)')
+
+            self.get_logger().info('Wait state (start)')
+            time.sleep(3)
+            self.get_logger().info('Wait state (end)')
+
+            self.get_logger().info('PostProcessing state (start)')
+            time.sleep(3)
+            msg = String()
+            msg.data = 'Planned trajectory ({0})'.format(Clock().now())
+            self.get_logger().info('PostProcessing state (end)')
+        
+        self.get_logger().info('Publish state (start)')
         self.trajectory_publisher.publish(msg)
-        # self.get_logger().info('Published message: {0}'.format(msg.data))
-        self.get_logger().info('Processing state (end)')
-        self.get_logger().info('Subscribe state (start))')
+        self.get_logger().info('Publish state (end)')
+
+        self.get_logger().info('Subscribe state (start)')
+
 
 def main(args=None):
     rclpy.init(args=args)
