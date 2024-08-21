@@ -44,8 +44,8 @@ def generate_launch_description():      # launch file basic method
         #     output='screen'),
         Node(
             package='perception',
-            executable='my_lidar_perception',
-            name='my_lidar_perception',
+            executable='my_perception',
+            name='my_perception',
             parameters=[param_dir],
             output='screen'),
     ])

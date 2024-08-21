@@ -28,9 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_camera_perception = perception.my_camera_perception:main',
-            'my_lidar_perception = perception.my_lidar_perception:main',
-            'my_object_detection_service = perception.my_object_detection_service:main',
+            'my_perception = perception.my_perception:main',
         ],
     },
 )

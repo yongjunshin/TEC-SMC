@@ -29,7 +29,6 @@ setup(
     entry_points={
         'console_scripts': [
             'my_control = control.my_control:main',
-            'my_emergency_service = control.my_emergency_service:main',
         ],
     },
 )

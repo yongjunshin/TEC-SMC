@@ -37,9 +37,15 @@ def generate_launch_description():      # launch file basic method
             description='Full path of parameter file'),
 
         Node(
+            package='sensor',
+            executable='my_sensor',
+            name='my_sensor',
+            parameters=[param_dir],
+            output='screen'),
+        Node(
             package='localization',
-            executable='my_lidar_localization',
-            name='my_lidar_localization',
+            executable='my_localization',
+            name='my_localization',
             parameters=[param_dir],
             output='screen'),
         # Node(
@@ -50,8 +56,8 @@ def generate_launch_description():      # launch file basic method
         #     output='screen'),
         Node(
             package='perception',
-            executable='my_lidar_perception',
-            name='my_lidar_perception',
+            executable='my_perception',
+            name='my_perception',
             parameters=[param_dir],
             output='screen'),
         Node(

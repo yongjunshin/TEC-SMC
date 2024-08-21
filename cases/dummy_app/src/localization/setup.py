@@ -28,7 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_lidar_localization = localization.my_lidar_localization:main',
+            'my_localization = localization.my_localization:main',
         ],
     },
 )

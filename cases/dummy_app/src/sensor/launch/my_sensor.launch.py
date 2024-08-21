@@ -26,9 +26,9 @@ def generate_launch_description():      # launch file basic method
     param_dir = LaunchConfiguration(        # Init execution configuration (Set parameter file location)
         'param_dir',
         default=os.path.join(               # Parameter file location
-            get_package_share_directory('localization'),
+            get_package_share_directory('sensor'),
             'param',
-            'my_localization_config.yaml'))
+            'my_sensor_config.yaml'))
 
     return LaunchDescription([              # Return description
         DeclareLaunchArgument(
@@ -37,9 +37,9 @@ def generate_launch_description():      # launch file basic method
             description='Full path of parameter file'),
 
         Node(
-            package='localization',
-            executable='my_localization',
-            name='my_localization',
+            package='sensor',
+            executable='my_sensor',
+            name='my_sensor',
             parameters=[param_dir],
             output='screen'),
     ])

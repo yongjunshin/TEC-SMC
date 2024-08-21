@@ -6,10 +6,10 @@ from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
 import time
 
-class MyLidarPerception(Node):
+class MyPerception(Node):
 
     def __init__(self):
-        super().__init__('my_lidar_perception')
+        super().__init__('my_perception')
         self.set_my_parameters()
 
         qos_profile = QoSProfile(depth=10)
@@ -115,7 +115,7 @@ class MyLidarPerception(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MyLidarPerception()
+    node = MyPerception()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

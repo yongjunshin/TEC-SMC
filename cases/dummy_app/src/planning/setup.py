@@ -29,7 +29,6 @@ setup(
     entry_points={
         'console_scripts': [
             'my_planning = planning.my_planning:main',
-            'my_destination_action = planning.my_destination_action:main',
         ],
     },
 )

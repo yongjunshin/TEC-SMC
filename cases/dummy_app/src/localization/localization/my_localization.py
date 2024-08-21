@@ -7,10 +7,10 @@ from std_msgs.msg import String
 import time
 
 
-class MyLidarLocalization(Node):
+class MyLocalization(Node):
 
     def __init__(self):
-        super().__init__('my_lidar_localization')
+        super().__init__('my_localization')
         self.set_my_parameters()
 
         qos_profile = QoSProfile(depth=10)
@@ -96,7 +96,7 @@ class MyLidarLocalization(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MyLidarLocalization()
+    node = MyLocalization()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
