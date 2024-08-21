@@ -11,6 +11,8 @@ class MyLidarLocalization(Node):
 
     def __init__(self):
         super().__init__('my_lidar_localization')
+        self.set_my_parameters()
+
         qos_profile = QoSProfile(depth=10)
         self.lidar_subscriber = self.create_subscription(
             LaserScan, 
@@ -24,8 +26,19 @@ class MyLidarLocalization(Node):
         self.get_logger().info('Subscribe state (start)')
 
 
+    def set_my_parameters(self):
+        self.declare_parameter('localization_proc_time_mean')
+        self.declare_parameter('localization_proc_time_std')
+
+        self.localization_proc_time_mean = self.get_parameter('localization_proc_time_mean').value
+        self.localization_proc_time_std = self.get_parameter('localization_proc_time_std').value
+
+        self.get_logger().info('[PARAM] localization_proc_time_mean: {0}'.format(self.localization_proc_time_mean))
+        self.get_logger().info('[PARAM] localization_proc_time_std: {0}'.format(self.localization_proc_time_std))
+
+
     def subscribe_lidar_message(self, msg):
-        self.get_logger().info('Received lidar scan header: {0}'.format(msg.header))
+        # self.get_logger().info('Received lidar scan header: {0}'.format(msg.header))
         self.get_logger().info('Subscribe state (end)')
         self.publish_lidar_localization_output_msg()
 

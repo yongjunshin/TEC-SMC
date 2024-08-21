@@ -14,8 +14,13 @@ class MyPlanning(Node):
 
     def __init__(self):
         super().__init__('my_planning')
+        self.set_my_parameters()
+
         qos_profile = QoSProfile(depth=10)
         self.callback_group = ReentrantCallbackGroup()      # Callback group definition for parallization
+
+        self.localization_data_available = False
+        self.perception_data_available = False
 
         self.localization_subscriber = self.create_subscription(
             String, 
@@ -23,18 +28,18 @@ class MyPlanning(Node):
             self.subscribe_localization_message, 
             qos_profile)
         
-        self.camera_perception_subscriber = self.create_subscription(
-            String, 
-            '/my_camera_perception_output', 
-            self.subscribe_camera_perception_message, 
-            qos_profile)
+        # self.camera_perception_subscriber = self.create_subscription(
+        #     String, 
+        #     '/my_camera_perception_output', 
+        #     self.subscribe_camera_perception_message, 
+        #     qos_profile)
         
-        self.destination_action_server = ActionServer(       # Action server definition
-            self,
-            Destination,      # Action type
-            'destination',   # Action name
-            self.destination_checker,   # Action callback function
-            callback_group=self.callback_group)     # Callback function parallization group
+        # self.destination_action_server = ActionServer(       # Action server definition
+        #     self,
+        #     Destination,      # Action type
+        #     'destination',   # Action name
+        #     self.destination_checker,   # Action callback function
+        #     callback_group=self.callback_group)     # Callback function parallization group
         
         self.lidar_perception_subscriber = self.create_subscription(
             String, 
@@ -43,47 +48,73 @@ class MyPlanning(Node):
             qos_profile)
 
         self.trajectory_publisher = self.create_publisher(String, '/my_trajectory', qos_profile)
-        self.timer = self.create_timer(1, self.publish_trajectory_msg)
+        # self.timer = self.create_timer(1, self.publish_trajectory_msg)
+
+        self.get_logger().info('Subscribe state (start)')
+
+
+    def set_my_parameters(self):
+        self.declare_parameter('planning_proc_time_mean')
+        self.declare_parameter('planning_proc_time_std')
+
+        self.planning_proc_time_mean = self.get_parameter('planning_proc_time_mean').value
+        self.planning_proc_time_std = self.get_parameter('planning_proc_time_std').value
+
+        self.get_logger().info('[PARAM] planning_proc_time_mean: {0}'.format(self.planning_proc_time_mean))
+        self.get_logger().info('[PARAM] planning_proc_time_std: {0}'.format(self.planning_proc_time_std))
+
 
 
     def subscribe_localization_message(self, msg):
-        self.get_logger().info('Received lidar localization output header {0}'.format(msg.data))
+        self.localization_data_available = True
+        # self.get_logger().info('Received lidar localization output header {0}'.format(msg.data))
 
-    def subscribe_camera_perception_message(self, msg):
-        self.get_logger().info('Received camera perception output header {0}'.format(msg.data))
+        if self.localization_data_available and self.perception_data_available:
+            self.publish_trajectory_msg()
+
+    # def subscribe_camera_perception_message(self, msg):
+    #     self.get_logger().info('Received camera perception output header {0}'.format(msg.data))
 
     def subscribe_lidar_perception_message(self, msg):
-        self.get_logger().info('Received lidar perception output header {0}'.format(msg.data))
+        self.perception_data_available = True
+        # self.get_logger().info('Received lidar perception output header {0}'.format(msg.data))
 
-    def destination_checker(self, goal_handle):
-        self.get_logger().info('Execute destination_checker action!')
-        feedback_msg = Destination.Feedback()     # Define action feedback holder
+        if self.localization_data_available and self.perception_data_available:
+            self.publish_trajectory_msg()
+
+    # def destination_checker(self, goal_handle):
+    #     self.get_logger().info('Execute destination_checker action!')
+    #     feedback_msg = Destination.Feedback()     # Define action feedback holder
         
-        cur_location = 0.0
-        destination = goal_handle.request.destination     # Action goal interpretation
-        distance_to_destination = random.randint(5, 10)
+    #     cur_location = 0.0
+    #     destination = goal_handle.request.destination     # Action goal interpretation
+    #     distance_to_destination = random.randint(5, 10)
 
-        diff_to_destination = distance_to_destination - cur_location
-        while diff_to_destination > 1.0:     # Action process until goal achievement
-            feedback_msg.diff_to_destination = diff_to_destination
-            self.get_logger().info('Feedback: {0}'.format(feedback_msg.diff_to_destination))
-            goal_handle.publish_feedback(feedback_msg)      # Action feedback publish
-            time.sleep(1)
-            cur_location = cur_location + 1.0
-            diff_to_destination = distance_to_destination - cur_location
+    #     diff_to_destination = distance_to_destination - cur_location
+    #     while diff_to_destination > 1.0:     # Action process until goal achievement
+    #         feedback_msg.diff_to_destination = diff_to_destination
+    #         self.get_logger().info('Feedback: {0}'.format(feedback_msg.diff_to_destination))
+    #         goal_handle.publish_feedback(feedback_msg)      # Action feedback publish
+    #         time.sleep(1)
+    #         cur_location = cur_location + 1.0
+    #         diff_to_destination = distance_to_destination - cur_location
 
-        goal_handle.succeed()       # Inform goal achievement status
-        result = Destination.Result()     # Action result generation
-        result.diff_to_destination = diff_to_destination
+    #     goal_handle.succeed()       # Inform goal achievement status
+    #     result = Destination.Result()     # Action result generation
+    #     result.diff_to_destination = diff_to_destination
         
-        return result       # Return action result
+    #     return result       # Return action result
 
     def publish_trajectory_msg(self):
+
+        self.get_logger().info('Subscribe state (end)')
+        self.get_logger().info('Processing state (start)')
         msg = String()
         msg.data = 'Planned trajectory ({0})'.format(Clock().now())
         self.trajectory_publisher.publish(msg)
-        self.get_logger().info('Published message: {0}'.format(msg.data))
-
+        # self.get_logger().info('Published message: {0}'.format(msg.data))
+        self.get_logger().info('Processing state (end)')
+        self.get_logger().info('Subscribe state (start))')
 
 def main(args=None):
     rclpy.init(args=args)

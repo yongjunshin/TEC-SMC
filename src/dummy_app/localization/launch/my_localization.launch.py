@@ -40,6 +40,6 @@ def generate_launch_description():      # launch file basic method
             package='localization',
             executable='my_lidar_localization',
             name='my_lidar_localization',
-            # parameters=[param_dir],
+            parameters=[param_dir],
             output='screen'),
     ])

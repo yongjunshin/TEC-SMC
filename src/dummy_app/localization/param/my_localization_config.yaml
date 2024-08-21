@@ -1,3 +1,5 @@
 /**: # namespace and node name (double stars means 'ignore')
   ros__parameters:
     temp_param: 0
+    localization_proc_time_mean: 10
+    localization_proc_time_std: 2

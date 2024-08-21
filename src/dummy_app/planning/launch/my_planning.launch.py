@@ -40,6 +40,6 @@ def generate_launch_description():      # launch file basic method
             package='planning',
             executable='my_planning',
             name='my_planning',
-            # parameters=[param_dir],
+            parameters=[param_dir],
             output='screen'),
     ])

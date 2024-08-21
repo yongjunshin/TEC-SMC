@@ -4,13 +4,18 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
-
+import time
 
 class MyLidarPerception(Node):
 
     def __init__(self):
         super().__init__('my_lidar_perception')
+        self.set_my_parameters()
+
         qos_profile = QoSProfile(depth=10)
+
+        self.sensor_data_available = False
+        self.localization_data_availalbe = False
         
         self.lidar_subscriber = self.create_subscription(
             LaserScan, 
@@ -25,22 +30,52 @@ class MyLidarPerception(Node):
             qos_profile)
         
         self.peception_output_publisher = self.create_publisher(String, '/my_lidar_perception_output', qos_profile)
-        self.timer = self.create_timer(1, self.publish_lidar_perception_output_msg)
+        # self.timer = self.create_timer(1, self.publish_lidar_perception_output_msg)
+
+        self.get_logger().info('Subscribe state (start)')
+
+
+    def set_my_parameters(self):
+        self.declare_parameter('perception_proc_time_mean')
+        self.declare_parameter('perception_proc_time_std')
+
+        self.perception_proc_time_mean = self.get_parameter('perception_proc_time_mean').value
+        self.perception_proc_time_std = self.get_parameter('perception_proc_time_std').value
+
+        self.get_logger().info('[PARAM] perception_proc_time_mean: {0}'.format(self.perception_proc_time_mean))
+        self.get_logger().info('[PARAM] perception_proc_time_std: {0}'.format(self.perception_proc_time_std))
 
     
     def subscribe_lidar_message(self, msg):
-        self.get_logger().info('Received lidar scan header: {0}'.format(msg.header))
+        self.sensor_data_available = True
+        # self.get_logger().info('Received lidar scan header: {0}'.format(msg.header))
+
+        if self.sensor_data_available and self.localization_data_availalbe:
+            self.publish_lidar_perception_output_msg()       
+
 
     def subscribe_lidar_localization_message(self, msg):
-        self.get_logger().info('Received lidar localization msg: {0}'.format(msg.data))
+        self.localization_data_availalbe = True
+        # self.get_logger().info('Received lidar localization msg: {0}'.format(msg.data))
+        
+        if self.sensor_data_available and self.localization_data_availalbe:
+            self.publish_lidar_perception_output_msg()
+
+            
 
 
     def publish_lidar_perception_output_msg(self):
+        self.get_logger().info('Subscribe state (end)')
+        self.get_logger().info('Processing state (start)')
+        time.sleep(3)
+
         msg = String()
         msg.data = 'Lidar perception output ({0})'.format(Clock().now())
         self.peception_output_publisher.publish(msg)
-        self.get_logger().info('Published message: {0}'.format(msg.data))
+        # self.get_logger().info('Published message: {0}'.format(msg.data))
 
+        self.get_logger().info('Processing state (end)')   
+        self.get_logger().info('Subscribe state (start)')
 
 def main(args=None):
     rclpy.init(args=args)

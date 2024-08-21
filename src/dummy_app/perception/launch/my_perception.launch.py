@@ -36,16 +36,16 @@ def generate_launch_description():      # launch file basic method
             default_value=param_dir,
             description='Full path of parameter file'),
 
-        Node(
-            package='perception',
-            executable='my_camera_perception',
-            name='my_camera_perception',
-            # parameters=[param_dir],
-            output='screen'),
+        # Node(
+        #     package='perception',
+        #     executable='my_camera_perception',
+        #     name='my_camera_perception',
+        #     # parameters=[param_dir],
+        #     output='screen'),
         Node(
             package='perception',
             executable='my_lidar_perception',
             name='my_lidar_perception',
-            # parameters=[param_dir],
+            parameters=[param_dir],
             output='screen'),
     ])
