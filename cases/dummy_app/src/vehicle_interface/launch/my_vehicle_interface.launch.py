@@ -26,9 +26,9 @@ def generate_launch_description():      # launch file basic method
     param_dir = LaunchConfiguration(        # Init execution configuration (Set parameter file location)
         'param_dir',
         default=os.path.join(               # Parameter file location
-            get_package_share_directory('bringing_up'),
+            get_package_share_directory('vehicle_interface'),
             'param',
-            'my_toy_bringing_up_config.yaml'))
+            'my_vehicle_interface_config.yaml'))
 
     return LaunchDescription([              # Return description
         DeclareLaunchArgument(
@@ -37,33 +37,9 @@ def generate_launch_description():      # launch file basic method
             description='Full path of parameter file'),
 
         Node(
-            package='localization',
-            executable='my_lidar_localization',
-            name='my_lidar_localization',
-            # parameters=[param_dir],
-            output='screen'),
-        Node(
-            package='perception',
-            executable='my_camera_perception',
-            name='my_camera_perception',
-            # parameters=[param_dir],
-            output='screen'),
-        Node(
-            package='perception',
-            executable='my_lidar_perception',
-            name='my_lidar_perception',
-            # parameters=[param_dir],
-            output='screen'),
-        Node(
-            package='planning',
-            executable='my_planning',
-            name='my_planning',
-            # parameters=[param_dir],
-            output='screen'),
-        Node(
-            package='control',
-            executable='my_control',
-            name='my_control',
-            # parameters=[param_dir],
+            package='vehicle_interface',
+            executable='my_vehicle_interface',
+            name='my_vehicle_interface',
+            parameters=[param_dir],
             output='screen'),
     ])

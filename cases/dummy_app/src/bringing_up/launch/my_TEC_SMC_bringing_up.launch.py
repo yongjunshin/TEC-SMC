@@ -72,4 +72,10 @@ def generate_launch_description():      # launch file basic method
             name='my_control',
             parameters=[param_dir],
             output='screen'),
+        Node(
+            package='vehicle_interface',
+            executable='my_vehicle_interface',
+            name='my_vehicle_interface',
+            parameters=[param_dir],
+            output='screen'),
     ])
