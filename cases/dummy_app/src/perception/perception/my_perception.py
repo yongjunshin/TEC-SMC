@@ -5,6 +5,7 @@ from rclpy.qos import QoSProfile
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
 import time
+import numpy as np
 
 class MyPerception(Node):
 
@@ -88,30 +89,40 @@ class MyPerception(Node):
 
         if self.perception_split == 0:
             self.get_logger().info('Processing state (start)')
-            time.sleep(3)
+            proc_latency = self.normal_latency(self.perception_proc_time_mean, self.perception_proc_time_std)
+            time.sleep(proc_latency)
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
             self.get_logger().info('Processing state (end)')
         else:
             self.get_logger().info('PreProcessing state (start)')
-            time.sleep(3)
+            pre_latency = self.normal_latency(self.perception_pre_time_mean, self.perception_pre_time_std)
+            time.sleep(pre_latency)
             self.get_logger().info('PreProcessing state (end)')
 
             self.get_logger().info('Wait state (start)')
-            time.sleep(3)
+            wait_latency = self.normal_latency(self.perception_wait_time_mean, self.perception_wait_time_std)
+            time.sleep(wait_latency)
             self.get_logger().info('Wait state (end)')
 
             self.get_logger().info('PostProcessing state (start)')
-            time.sleep(3)
+            post_latency = self.normal_latency(self.perception_post_time_mean, self.perception_post_time_std)
+            time.sleep(post_latency)
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
             self.get_logger().info('PostProcessing state (end)')
 
-        self.get_logger().info('Publish state (start)')
+        # self.get_logger().info('Publish state (start)')
         self.peception_output_publisher.publish(msg)
-        self.get_logger().info('Publish state (end)')
+        # self.get_logger().info('Publish state (end)')
 
         self.get_logger().info('Subscribe state (start)')
+
+    def normal_latency(self, mean, stddev):
+        latency = np.random.normal(mean, stddev, 1)[0]
+        if latency < 0:
+            latency = 0
+        return latency
 
 def main(args=None):
     rclpy.init(args=args)

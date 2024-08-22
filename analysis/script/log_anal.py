@@ -2,12 +2,14 @@ import re
 import csv
 import numpy as np
 from collections import defaultdict
+from scipy.stats import norm
 
 # Function to extract state information from log lines
 def extract_state_info(line):
-    match = re.search(r'\[(\d+\.\d+)\].*: (\w+ state) \((start|end)\)', line)
+    #match = re.search(r'\[(\d+\.\d+)\].*:(\w+ state) \((start|end)\)', line)
+    match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)', line)
     if match:
-        return float(match.group(1)), match.group(2), match.group(3)
+        return float(match.group(1)), match.group(2)+' '+match.group(3), match.group(4)
     return None
 
 # Read the log file and process state information
@@ -35,7 +37,29 @@ def calculate_stats(states):
     for state, durations in states.items():
         mean = np.mean(durations)
         std = np.std(durations)
-        stats[state] = {'mean': mean, 'std': std, 'samples': durations}
+
+        # Calculate z-score for 99% confidence interval
+        z_score = norm.ppf(0.995)  # 0.995 because it's a two-tailed test
+        
+        # Determine the thresholds for the 95% confidence interval
+        lower_threshold = mean - z_score * std
+        upper_threshold = mean + z_score * std
+        
+        # Filter out outliers
+        filtered_durations = [x for x in durations if lower_threshold <= x <= upper_threshold]
+        
+        # Recalculate mean and std deviation with filtered data
+        if filtered_durations:  # Check if there are any values left after filtering
+            filtered_array = np.array(filtered_durations)
+            mean_filtered = np.mean(filtered_array)
+            std_filtered = np.std(filtered_array)
+        else:
+            # Handle the case where no data remains after filtering
+            mean_filtered = mean
+            std_filtered = std
+
+        stats[state] = {'mean': mean_filtered, 'std': std_filtered, 'samples': durations}
+
     return stats
 
 # Write results to CSV file
@@ -57,7 +81,7 @@ def write_csv(stats, filename):
 
 # Main execution
 log_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/data/'
-log_name = 'log'
+log_name = 'control_1_log'
 result_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/results/'
 
 log_filename = log_dir + log_name + '.txt'

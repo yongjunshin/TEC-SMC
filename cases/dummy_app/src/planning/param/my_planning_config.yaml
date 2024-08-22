@@ -1,11 +1,11 @@
 /**: # namespace and node name (double stars means 'ignore')
   ros__parameters:
     planning_split: 1
-    planning_proc_time_mean: 4
-    planning_proc_time_std: 2
-    planning_pre_time_mean: 1
-    planning_pre_time_std: 0.2
-    planning_wait_time_mean: 1
-    planning_wait_time_std: 0.2
-    planning_post_time_mean: 1
-    planning_post_time_std: 0.2
+    planning_proc_time_mean: 0.1
+    planning_proc_time_std: 0.01
+    planning_pre_time_mean: 0.01
+    planning_pre_time_std: 0.001
+    planning_wait_time_mean: 0.05
+    planning_wait_time_std: 0.005
+    planning_post_time_mean: 0.01
+    planning_post_time_std: 0.001

@@ -25,23 +25,14 @@ class MyVehicleInterface(Node):
 
 
     def set_my_parameters(self):
-        self.declare_parameter('vehicle_interface_sub_time_mean')
-        self.declare_parameter('vehicle_interface_sub_time_std')
-
-        self.vehicle_interface_sub_time_mean = self.get_parameter('vehicle_interface_sub_time_mean').value
-        self.vehicle_interface_sub_time_std = self.get_parameter('vehicle_interface_sub_time_std').value
-
-        self.get_logger().info('[PARAM] vehicle_interface_sub_time_mean: {0}'.format(self.vehicle_interface_sub_time_mean))
-        self.get_logger().info('[PARAM] vehicle_interface_sub_time_std: {0}'.format(self.vehicle_interface_sub_time_std))
+        pass
 
 
     def subscribe_control_message(self, msg):
-        self.get_logger().info('Subscribe state (start-end)')
         # self.get_logger().info('Received control message: [linear.x:{0}, angular.z:{1}]'.format(msg.linear.x, msg.angular.z))
+        self.get_logger().info('Subscribe state (end)')
+        self.get_logger().info('Subscribe state (start)')
         
-
-
-
 
 def main(args=None):
     rclpy.init(args=args)

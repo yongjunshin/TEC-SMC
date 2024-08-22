@@ -6,6 +6,7 @@ from geometry_msgs.msg import Twist
 from rclpy.callback_groups import ReentrantCallbackGroup
 from ros_node_interface.srv import EmergencyControl
 import time
+import numpy as np
 
 
 class MyControl(Node):
@@ -33,13 +34,6 @@ class MyControl(Node):
             '/my_trajectory', 
             self.subscribe_planning_message, 
             qos_profile)
-
-        # self.emergency_service_server = self.create_service(       # Service server definition
-        #     EmergencyControl,                       # Service type
-        #     'emergency_control',                    # Service name
-        #     self.get_emergency_control_request,     # Service server callback function
-        #     callback_group=self.callback_group)     # Callback function parallization group
-
 
         self.twist_publisher = self.create_publisher(Twist, '/cmd_vel', qos_profile)
         # self.timer = self.create_timer(1, self.publish_control_msg)
@@ -92,25 +86,14 @@ class MyControl(Node):
         if self.localization_data_available and self.planning_data_available:
             self.publish_control_msg()
 
-    
-    # def get_emergency_control_request(self, request, response):
-    #     self.emergency = request.emergency_control_request    # Interprete service request
-    #     if self.emergency:      # Service respond instantiation
-    #         response.control_holder = 'driver'
-    #         self.get_logger().info('Emergency! The driver takes control!')
-    #     else:
-    #         response.control_holder = 'vehicle'
-    #         self.get_logger().info('Emergency released! The vehicle takes control!')
-        
-    #     return response     # return service respond
-    
 
     def publish_control_msg(self):
         self.get_logger().info('Subscribe state (end)')
 
         if self.control_split == 0:
             self.get_logger().info('Processing state (start)')
-            time.sleep(3)
+            proc_latency = self.normal_latency(self.control_proc_time_mean, self.control_proc_time_std)
+            time.sleep(proc_latency)
             msg = Twist()
             if self.emergency:
                 msg.linear.x = 0.0
@@ -121,15 +104,18 @@ class MyControl(Node):
             self.get_logger().info('Processing state (end)')
         else:
             self.get_logger().info('PreProcessing state (start)')
-            time.sleep(3)
+            pre_latency = self.normal_latency(self.control_pre_time_mean, self.control_pre_time_std)
+            time.sleep(pre_latency)
             self.get_logger().info('PreProcessing state (end)')
 
             self.get_logger().info('Wait state (start)')
-            time.sleep(3)
+            wait_latency = self.normal_latency(self.control_wait_time_mean, self.control_wait_time_std)
+            time.sleep(wait_latency)
             self.get_logger().info('Wait state (end)')
 
             self.get_logger().info('PostProcessing state (start)')
-            time.sleep(3)
+            post_latency = self.normal_latency(self.control_post_time_mean, self.control_post_time_std)
+            time.sleep(post_latency)
             msg = Twist()
             if self.emergency:
                 msg.linear.x = 0.0
@@ -139,12 +125,17 @@ class MyControl(Node):
                 msg.angular.z = 1.0
             self.get_logger().info('PostProcessing state (end)')
         
-        self.get_logger().info('Publish state (start)')
+        # self.get_logger().info('Publish state (start)')
         self.twist_publisher.publish(msg)
-        self.get_logger().info('Publish state (end)')
+        # self.get_logger().info('Publish state (end)')
 
         self.get_logger().info('Subscribe state (start)')
 
+    def normal_latency(self, mean, stddev):
+        latency = np.random.normal(mean, stddev, 1)[0]
+        if latency < 0:
+            latency = 0
+        return latency
 
 def main(args=None):
     rclpy.init(args=args)

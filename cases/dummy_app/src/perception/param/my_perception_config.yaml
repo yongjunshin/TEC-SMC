@@ -1,11 +1,11 @@
 /**: # namespace and node name (double stars means 'ignore')
   ros__parameters:
     perception_split: 1
-    perception_proc_time_mean: 4
-    perception_proc_time_std: 2
-    perception_pre_time_mean: 1
-    perception_pre_time_std: 0.2
-    perception_wait_time_mean: 1
-    perception_wait_time_std: 0.2
-    perception_post_time_mean: 1
-    perception_post_time_std: 0.2
+    perception_proc_time_mean: 0.2
+    perception_proc_time_std: 0.02
+    perception_pre_time_mean: 0.01
+    perception_pre_time_std: 0.001
+    perception_wait_time_mean: 0.1
+    perception_wait_time_std: 0.001
+    perception_post_time_mean: 0.01
+    perception_post_time_std: 0.001

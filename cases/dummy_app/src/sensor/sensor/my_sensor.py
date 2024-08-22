@@ -15,25 +15,24 @@ class MySensor(Node):
         qos_profile = QoSProfile(depth=10)
 
         self.ladar_publisher = self.create_publisher(LaserScan, '/scan', qos_profile)
-        self.timer = self.create_timer(1, self.publish_lidar_msg)
+        self.timer = self.create_timer(self.sensor_sense_time_mean, self.publish_lidar_msg)
 
+        self.get_logger().info('Sense state (start)')
     
     def set_my_parameters(self):
         self.declare_parameter('sensor_sense_time_mean')
-        self.declare_parameter('sensor_sense_time_std')
 
         self.sensor_sense_time_mean = self.get_parameter('sensor_sense_time_mean').value
-        self.sensor_sense_time_std = self.get_parameter('sensor_sense_time_std').value
 
         self.get_logger().info('[PARAM] sensor_sense_time_mean: {0}'.format(self.sensor_sense_time_mean))
-        self.get_logger().info('[PARAM] sensor_sense_time_std: {0}'.format(self.sensor_sense_time_std))
 
 
     def publish_lidar_msg(self):
-        self.get_logger().info('Sensing state (start-end)')
         msg = LaserScan()
         self.ladar_publisher.publish(msg)
         # self.get_logger().info('Published lidar scan header: {0}'.format(msg.header))
+        self.get_logger().info('Sense state (end)')
+        self.get_logger().info('Sense state (start)')
 
 
 def main(args=None):
