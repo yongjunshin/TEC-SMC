@@ -1,4 +1,6 @@
 build/
 install/
 log/
+data/
+results/
 __pycache__/
