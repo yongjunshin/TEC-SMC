@@ -48,12 +48,6 @@ def generate_launch_description():      # launch file basic method
             name='my_localization',
             parameters=[param_dir],
             output='screen'),
-        # Node(
-        #     package='perception',
-        #     executable='my_camera_perception',
-        #     name='my_camera_perception',
-        #     # parameters=[param_dir],
-        #     output='screen'),
         Node(
             package='perception',
             executable='my_perception',

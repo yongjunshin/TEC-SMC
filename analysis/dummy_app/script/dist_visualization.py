@@ -53,5 +53,5 @@ def visualize_from_csv(filename):
 
 # Example usage
 result_dir = 'analysis/results/'
-csv_filename = 'vehicle_interface_log_anal.csv'  # Replace with your actual CSV file
+csv_filename = 'system_total_0_log_anal.csv'  # Replace with your actual CSV file
 visualize_from_csv(result_dir + csv_filename)
