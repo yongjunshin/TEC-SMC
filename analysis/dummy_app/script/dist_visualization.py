@@ -17,7 +17,11 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
     ax_twin = ax.twinx()
     ax_twin.plot(x_values, normal_dist, 'r-', lw=2, label='Normal Distribution')
 
-    ax.set_xlabel('Staying time (second)')
+
+    if "power" in state_name.lower():
+        ax.set_xlabel('Power (joule)')  
+    else:
+        ax.set_xlabel('Staying time (second)')
     ax.set_ylabel('Number of samples')
     ax.set_title(state_name)
 
@@ -45,6 +49,7 @@ def visualize_from_csv(filename):
     fig, axes = plt.subplots(len(data), 1, figsize=(8, 2*len(data)), squeeze=False)
 
     for i, (state, samples, mean, stddev) in enumerate(data):
+        print(state)
         plot_state_distribution(axes[i, 0], state, samples, mean, stddev)
 
     plt.tight_layout(pad=3, h_pad=10, w_pad=10)
@@ -52,6 +57,6 @@ def visualize_from_csv(filename):
     plt.show()
 
 # Example usage
-result_dir = 'analysis/results/'
-csv_filename = 'system_total_0_log_anal.csv'  # Replace with your actual CSV file
+result_dir = 'analysis/dummy_app/results/'
+csv_filename = 'system_total_energy_0_log_anal.csv'  # Replace with your actual CSV file
 visualize_from_csv(result_dir + csv_filename)

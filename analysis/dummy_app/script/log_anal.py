@@ -6,10 +6,19 @@ from scipy.stats import norm
 
 # Function to extract state information from log lines
 def extract_state_info(line):
-    #match = re.search(r'\[(\d+\.\d+)\].*:(\w+ state) \((start|end)\)', line)
-    match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)', line)
+    # #match = re.search(r'\[(\d+\.\d+)\].*:(\w+ state) \((start|end)\)', line)
+    # match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)', line)
+    # if match:
+    #     return float(match.group(1)), match.group(2)+' '+match.group(3), match.group(4)
+
+    match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)(?:\s*\([\w\s]+ power:\s*([\d.]+)\))?', line)
     if match:
-        return float(match.group(1)), match.group(2)+' '+match.group(3), match.group(4)
+        timestamp = float(match.group(1))
+        component_state = match.group(2) + ' ' + match.group(3)
+        start_end = match.group(4)
+        power = float(match.group(5)) if match.group(5) else None
+        return timestamp, component_state, start_end, power
+    
     return None
 
 # Read the log file and process state information
@@ -21,12 +30,13 @@ def process_log(filename):
         for line in file:
             info = extract_state_info(line)
             if info:
-                timestamp, state, action = info
+                timestamp, state, action, power = info
                 if action == 'start':
                     current_states[state] = timestamp
                 elif action == 'end' and state in current_states:
                     duration = timestamp - current_states[state]
                     states[state].append(duration)
+                    states[state + ' power'].append(power)
                     del current_states[state]
 
     return states
@@ -75,14 +85,15 @@ def write_csv(stats, filename):
         writer.writerow(header)
 
         for state, data in stats.items():
+            print(state)
             padded_samples = data['samples'] + [''] * (max_samples - len(data['samples']))
             row = [state, data['mean'], data['std']] + padded_samples
             writer.writerow(row)
 
 # Main execution
-log_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/data/'
-log_name = 'system_total_0_log'
-result_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/results/'
+log_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/data/'
+log_name = 'system_total_energy_1_log'
+result_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/results/'
 
 log_filename = log_dir + log_name + '.txt'
 csv_filename = result_dir + log_name + '_anal.csv'

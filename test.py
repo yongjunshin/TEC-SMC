@@ -1,6 +1,4 @@
 from pyJoules.device import DeviceFactory
-from pyJoules.device.rapl_device import RaplPackageDomain, RaplDramDomain
-from pyJoules.device.nvidia_device import NvidiaGPUDomain
 from pyJoules.energy_meter import EnergyMeter
 
 devices = DeviceFactory.create_devices()
@@ -23,5 +21,12 @@ bar()
 meter.stop()
 
 trace = meter.get_trace()
+
 for sample in trace:
+    total_energy = 0
     print(sample.timestamp, sample.tag, sample.duration, sample.energy)
+    total_energy = sum(sample.energy.values())
+    total_power = total_energy / sample.duration
+    print('total_energy:', total_energy, total_power)
+
+print('total_energy:', sum(trace[0].energy.values())/trace[0].duration)

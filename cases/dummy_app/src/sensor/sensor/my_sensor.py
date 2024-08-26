@@ -1,9 +1,10 @@
 import rclpy
-from rclpy.clock import Clock
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String
+
+from pyJoules.device import DeviceFactory
+from pyJoules.energy_meter import EnergyMeter
 
 
 class MySensor(Node):
@@ -12,12 +13,16 @@ class MySensor(Node):
         super().__init__('my_sensor')
         self.set_my_parameters()
 
+        self.devices = DeviceFactory.create_devices()
+        self.meter = EnergyMeter(self.devices)
+
         qos_profile = QoSProfile(depth=10)
 
         self.ladar_publisher = self.create_publisher(LaserScan, '/scan', qos_profile)
         self.timer = self.create_timer(self.sensor_sense_time_mean, self.publish_lidar_msg)
 
         self.get_logger().info('Sense state (start)')
+        self.meter.start(tag='Sense')
     
     def set_my_parameters(self):
         self.declare_parameter('sensor_sense_time_mean')
@@ -31,8 +36,17 @@ class MySensor(Node):
         msg = LaserScan()
         self.ladar_publisher.publish(msg)
         # self.get_logger().info('Published lidar scan header: {0}'.format(msg.header))
-        self.get_logger().info('Sense state (end)')
+
+        self.meter.stop()
+        energy_tag, power = self.get_power()
+        self.get_logger().info('Sense state (end) ({0} power:{1})'.format(energy_tag, power))
         self.get_logger().info('Sense state (start)')
+        self.meter.start(tag='Sense')
+
+    def get_power(self):
+        sample = self.meter.get_trace()[0]
+        power = sum(sample.energy.values())/sample.duration
+        return sample.tag, power
 
 
 def main(args=None):

@@ -4,9 +4,11 @@ from rclpy.qos import QoSProfile
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from rclpy.callback_groups import ReentrantCallbackGroup
-from ros_node_interface.srv import EmergencyControl
 import time
 import numpy as np
+
+from pyJoules.device import DeviceFactory
+from pyJoules.energy_meter import EnergyMeter
 
 
 class MyControl(Node):
@@ -14,6 +16,9 @@ class MyControl(Node):
     def __init__(self):
         super().__init__('my_control')
         self.set_my_parameters()
+
+        self.devices = DeviceFactory.create_devices()
+        self.meter = EnergyMeter(self.devices)
 
         qos_profile = QoSProfile(depth=10)
         self.callback_group = ReentrantCallbackGroup()      # Callback group definition for parallization
@@ -39,6 +44,7 @@ class MyControl(Node):
         # self.timer = self.create_timer(1, self.publish_control_msg)
 
         self.get_logger().info('Subscribe state (start)')
+        self.meter.start(tag='Subscribe')
 
 
     def set_my_parameters(self):
@@ -88,10 +94,13 @@ class MyControl(Node):
 
 
     def publish_control_msg(self):
-        self.get_logger().info('Subscribe state (end)')
+        self.meter.stop()
+        energy_tag, power = self.get_power()
+        self.get_logger().info('Subscribe state (end) ({0} power:{1})'.format(energy_tag, power))
 
         if self.control_split == 0:
             self.get_logger().info('Processing state (start)')
+            self.meter.start(tag='Processing')
             proc_latency = self.normal_latency(self.control_proc_time_mean, self.control_proc_time_std)
             time.sleep(proc_latency)
             msg = Twist()
@@ -101,19 +110,28 @@ class MyControl(Node):
             else:
                 msg.linear.x = 0.0
                 msg.angular.z = 1.0
-            self.get_logger().info('Processing state (end)')
+            self.meter.stop()
+            energy_tag, power = self.get_power()    
+            self.get_logger().info('Processing state (end) ({0} power:{1})'.format(energy_tag, power))
         else:
             self.get_logger().info('PreProcessing state (start)')
+            self.meter.start(tag='PreProcessing')
             pre_latency = self.normal_latency(self.control_pre_time_mean, self.control_pre_time_std)
             time.sleep(pre_latency)
-            self.get_logger().info('PreProcessing state (end)')
+            self.meter.stop()
+            energy_tag, power = self.get_power()
+            self.get_logger().info('PreProcessing state (end) ({0} power:{1})'.format(energy_tag, power))
 
             self.get_logger().info('Wait state (start)')
+            self.meter.start(tag='Wait')
             wait_latency = self.normal_latency(self.control_wait_time_mean, self.control_wait_time_std)
             time.sleep(wait_latency)
-            self.get_logger().info('Wait state (end)')
+            self.meter.stop()
+            energy_tag, power = self.get_power()
+            self.get_logger().info('Wait state (end) ({0} power:{1})'.format(energy_tag, power))
 
             self.get_logger().info('PostProcessing state (start)')
+            self.meter.start(tag='PostProcessing')
             post_latency = self.normal_latency(self.control_post_time_mean, self.control_post_time_std)
             time.sleep(post_latency)
             msg = Twist()
@@ -123,19 +141,27 @@ class MyControl(Node):
             else:
                 msg.linear.x = 0.0
                 msg.angular.z = 1.0
-            self.get_logger().info('PostProcessing state (end)')
+            self.meter.stop()
+            energy_tag, power = self.get_power()
+            self.get_logger().info('PostProcessing state (end) ({0} power:{1})'.format(energy_tag, power))
         
         # self.get_logger().info('Publish state (start)')
         self.twist_publisher.publish(msg)
         # self.get_logger().info('Publish state (end)')
 
         self.get_logger().info('Subscribe state (start)')
+        self.meter.start(tag='Subscribe')
 
     def normal_latency(self, mean, stddev):
         latency = np.random.normal(mean, stddev, 1)[0]
         if latency < 0:
             latency = 0
         return latency
+    
+    def get_power(self):
+        sample = self.meter.get_trace()[0]
+        power = sum(sample.energy.values())/sample.duration
+        return sample.tag, power
 
 def main(args=None):
     rclpy.init(args=args)
