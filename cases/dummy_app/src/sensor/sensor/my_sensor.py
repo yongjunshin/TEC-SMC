@@ -38,15 +38,16 @@ class MySensor(Node):
         # self.get_logger().info('Published lidar scan header: {0}'.format(msg.header))
 
         self.meter.stop()
-        energy_tag, power = self.get_power()
-        self.get_logger().info('Sense state (end) ({0} power:{1})'.format(energy_tag, power))
+        energy_tag, duration, power, energy = self.get_power()
+        self.get_logger().info('Sense state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
         self.get_logger().info('Sense state (start)')
         self.meter.start(tag='Sense')
 
     def get_power(self):
         sample = self.meter.get_trace()[0]
-        power = sum(sample.energy.values())/sample.duration
-        return sample.tag, power
+        energy = sum(sample.energy.values()) 
+        power = energy/sample.duration
+        return sample.tag, sample.duration, power, energy
 
 
 def main(args=None):

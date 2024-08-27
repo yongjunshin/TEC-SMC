@@ -36,15 +36,16 @@ class MyVehicleInterface(Node):
     def subscribe_control_message(self, msg):
         # self.get_logger().info('Received control message: [linear.x:{0}, angular.z:{1}]'.format(msg.linear.x, msg.angular.z))
         self.meter.stop()
-        energy_tag, power = self.get_power()
-        self.get_logger().info('Subscribe state (end) ({0} power:{1})'.format(energy_tag, power))
+        energy_tag, duration, power, energy = self.get_power()
+        self.get_logger().info('Subscribe state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
         self.get_logger().info('Subscribe state (start)')
         self.meter.start(tag='Subscribe')
 
     def get_power(self):
         sample = self.meter.get_trace()[0]
-        power = sum(sample.energy.values())/sample.duration
-        return sample.tag, power
+        energy = sum(sample.energy.values()) 
+        power = energy/sample.duration
+        return sample.tag, sample.duration, power, energy
         
 
 def main(args=None):

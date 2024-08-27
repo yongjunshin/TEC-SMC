@@ -98,8 +98,8 @@ class MyPlanning(Node):
 
     def publish_trajectory_msg(self):
         self.meter.stop()
-        energy_tag, power = self.get_power()
-        self.get_logger().info('Subscribe state (end) ({0} power:{1})'.format(energy_tag, power))
+        energy_tag, duration, power, energy = self.get_power()
+        self.get_logger().info('Subscribe state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
         if self.planning_split == 0:
             self.get_logger().info('Processing state (start)')
@@ -109,24 +109,24 @@ class MyPlanning(Node):
             msg = String()
             msg.data = 'Planned trajectory ({0})'.format(Clock().now())
             self.meter.stop()
-            energy_tag, power = self.get_power()
-            self.get_logger().info('Processing state (end) ({0} power:{1})'.format(energy_tag, power))
+            energy_tag, duration, power, energy = self.get_power()
+            self.get_logger().info('Processing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
         else:
             self.get_logger().info('PreProcessing state (start)')
             self.meter.start(tag='PreProcessing')
             pre_latency = self.normal_latency(self.planning_pre_time_mean, self.planning_pre_time_std)
             time.sleep(pre_latency)
             self.meter.stop()
-            energy_tag, power = self.get_power()
-            self.get_logger().info('PreProcessing state (end) ({0} power:{1})'.format(energy_tag, power))
+            energy_tag, duration, power, energy = self.get_power()
+            self.get_logger().info('PreProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('Wait state (start)')
             self.meter.start(tag='Wait')
             wait_latency = self.normal_latency(self.planning_wait_time_mean, self.planning_wait_time_std)
             time.sleep(wait_latency)
             self.meter.stop()
-            energy_tag, power = self.get_power()
-            self.get_logger().info('Wait state (end) ({0} power:{1})'.format(energy_tag, power))
+            energy_tag, duration, power, energy = self.get_power()
+            self.get_logger().info('Wait state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('PostProcessing state (start)')
             self.meter.start(tag='PostProcessing')
@@ -135,8 +135,8 @@ class MyPlanning(Node):
             msg = String()
             msg.data = 'Planned trajectory ({0})'.format(Clock().now())
             self.meter.stop()
-            energy_tag, power = self.get_power()
-            self.get_logger().info('PostProcessing state (end) ({0} power:{1})'.format(energy_tag, power))
+            energy_tag, duration, power, energy = self.get_power()
+            self.get_logger().info('PostProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
         
         # self.get_logger().info('Publish state (start)')
         self.trajectory_publisher.publish(msg)
@@ -154,8 +154,9 @@ class MyPlanning(Node):
     
     def get_power(self):
         sample = self.meter.get_trace()[0]
-        power = sum(sample.energy.values())/sample.duration
-        return sample.tag, power
+        energy = sum(sample.energy.values()) 
+        power = energy/sample.duration
+        return sample.tag, sample.duration, power, energy
 
 def main(args=None):
     rclpy.init(args=args)
