@@ -3,6 +3,7 @@ import csv
 import numpy as np
 from collections import defaultdict
 from scipy.stats import norm
+import scipy.stats as stats
 
 # Function to extract state information from log lines
 def extract_state_info(line):
@@ -46,69 +47,53 @@ def process_log(filename):
 
     return states
 
-# # Calculate statistics for each state
-# def calculate_stats(states):
-#     stats = {}
-#     for state, durations in states.items():
-#         mean = np.mean(durations)
-#         std = np.std(durations)
+def fit_and_test(data, distributions):
+    results = []
 
-#         # Calculate z-score for 99% confidence interval
-#         z_score = norm.ppf(0.995)  # 0.995 because it's a two-tailed test
+    # Convert to numpy array for easier calculations
+    data_array = np.array(data)
+    
+    # Calculate 1st and 99th percentiles
+    lower_threshold = np.percentile(data_array, 1)
+    upper_threshold = np.percentile(data_array, 99)
+    
+    # Filter out outliers
+    filtered_data = data_array[(data_array >= lower_threshold) & (data_array <= upper_threshold)]
+
+    for dist_name in distributions:
+        dist = getattr(stats, dist_name)
+        params = dist.fit(filtered_data)
         
-#         # Determine the thresholds for the 95% confidence interval
-#         lower_threshold = mean - z_score * std
-#         upper_threshold = mean + z_score * std
+        # Perform Kolmogorov-Smirnov test
+        ks_statistic, p_value = stats.kstest(filtered_data, dist_name, args=params)
         
-#         # Filter out outliers
-#         filtered_durations = [x for x in durations if lower_threshold <= x <= upper_threshold]
-        
-#         # Recalculate mean and std deviation with filtered data
-#         if filtered_durations:  # Check if there are any values left after filtering
-#             filtered_array = np.array(filtered_durations)
-#             mean_filtered = np.mean(filtered_array)
-#             std_filtered = np.std(filtered_array)
-#         else:
-#             # Handle the case where no data remains after filtering
-#             mean_filtered = mean
-#             std_filtered = std
+        results.append({
+            'distribution': dist_name,
+            'parameters': params,
+            'ks_statistic': ks_statistic,
+            'p_value': p_value,
+            'dist_param': dist
+        })
+    
+    return sorted(results, key=lambda x: x['ks_statistic'])
 
-#         stats[state] = {'mean': mean_filtered, 'std': std_filtered, 'samples': durations}
-
-#     return stats
-
-def calculate_stats(states):
+# Calculate statistics for each state
+def calculate_stats(states, dist_to_test):
     stats = {}
     for state, durations in states.items():
-        # Convert to numpy array for easier calculations
-        durations_array = np.array(durations)
-        
-        # Calculate initial mean and std
-        mean = np.mean(durations_array)
-        std = np.std(durations_array)
-        
-        # Calculate 1st and 99th percentiles
-        lower_threshold = np.percentile(durations_array, 1)
-        upper_threshold = np.percentile(durations_array, 99)
-        
-        # Filter out outliers
-        filtered_durations = durations_array[(durations_array >= lower_threshold) & 
-                                             (durations_array <= upper_threshold)]
-        
-        # Recalculate mean and std deviation with filtered data
-        if filtered_durations.size > 0:  # Check if there are any values left after filtering
-            mean_filtered = np.mean(filtered_durations)
-            std_filtered = np.std(filtered_durations)
-        else:
-            # Handle the case where no data remains after filtering
-            mean_filtered = mean
-            std_filtered = std
+        print(state)
+        results = fit_and_test(durations, dist_to_test)
 
-        stats[state] = {
-            'mean': mean_filtered, 
-            'std': std_filtered, 
-            'samples': filtered_durations.tolist()  # Convert back to list for consistency
-        }
+        # Find the result with the minimum p-value
+        min_ks_value_result = min(results, key=lambda x: x['ks_statistic'])
+
+        # Print the result with the minimum p-value
+        print(f"Distribution: {min_ks_value_result['distribution']}")
+        print(f"KS statistic: {min_ks_value_result['ks_statistic']:.4f}")
+        print(f"p-value: {min_ks_value_result['p_value']:.8f}")
+        print(f"Parameters: {min_ks_value_result['parameters']}")
+        print(f"Param: {min_ks_value_result['dist_param']}")
+        print()
 
     return stats
 
@@ -142,9 +127,10 @@ csv_filename = result_dir + log_name + '_anal.csv'
 states = process_log(log_filename)
 
 # Calculate statistics
-stats = calculate_stats(states)
+distributions_to_test = ['norm', 'gamma', 'beta', 'arcsine', 'triang', 'weibull_min']
+stats = calculate_stats(states, distributions_to_test)
 
 # Write results to CSV
-write_csv(stats, csv_filename)
+# write_csv(stats, csv_filename)
 
-print(f"Analysis complete. Results written to {csv_filename}")
+# print(f"Analysis complete. Results written to {csv_filename}")

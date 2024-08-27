@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+from scipy.stats import norm
 
 def normal_pdf(x, mean, std_dev):
     coefficient = 1 / (std_dev * np.sqrt(2 * np.pi))
@@ -9,7 +10,10 @@ def normal_pdf(x, mean, std_dev):
 
 def plot_state_distribution(ax, state_name, samples, mean, stddev):
     samples = np.array(samples)
+    
     min_sample, max_sample = np.min(samples), np.max(samples)
+    
+
     x_values = np.linspace(min_sample, max_sample, 1000)
     normal_dist = normal_pdf(x_values, mean, stddev)
 
@@ -18,8 +22,12 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
     ax_twin.plot(x_values, normal_dist, 'r-', lw=2, label='Normal Distribution')
 
 
-    if "power" in state_name.lower():
-        ax.set_xlabel('Power (joule)')  
+    if "duration" in state_name.lower():
+        ax.set_xlabel('pyJoule duration (second)') 
+    elif "power" in state_name.lower():
+        ax.set_xlabel('Power (micro watt)')  
+    elif "energy" in state_name.lower():
+        ax.set_xlabel('Energy (micro joule)')  
     else:
         ax.set_xlabel('Staying time (second)')
     ax.set_ylabel('Number of samples')
@@ -58,5 +66,5 @@ def visualize_from_csv(filename):
 
 # Example usage
 result_dir = 'analysis/dummy_app/results/'
-csv_filename = 'system_total_energy_0_log_anal.csv'  # Replace with your actual CSV file
+csv_filename = 'system_total_0_log_anal.csv'  # Replace with your actual CSV file
 visualize_from_csv(result_dir + csv_filename)
