@@ -47,6 +47,8 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
         ax.set_xlabel('Energy (micro joule)')  
     else:
         ax.set_xlabel('Staying time (second)')
+        # duration_dist_dict[state_name + ' duration'] = normal_dist
+        # duration_x_dict[state_name + ' duration'] = x_values
     ax.set_ylabel('Number of samples')
     ax.set_title(state_name)
 

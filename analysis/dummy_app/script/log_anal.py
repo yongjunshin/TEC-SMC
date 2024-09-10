@@ -13,6 +13,7 @@ def extract_state_info(line):
 
     #match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)(?:\s*\([\w\s]+ power:\s*([\d.]+)\))?', line)
     match = re.search(r'\[(\d+\.\d+)\]\s*\[(\w+)\]\s*:\s*(\w+ state) \((start|end)\)(?:\s*\([\w\s]+ duration:\s*([\d.]+)\))?(?:\s*\([\w\s]+ power:\s*([\d.]+)\))?(?:\s*\([\w\s]+ energy:\s*([\d.]+)\))?', line)
+    
     if match:
         timestamp = float(match.group(1))
         component_state = match.group(2) + ' ' + match.group(3)
@@ -34,16 +35,19 @@ def process_log(filename):
             info = extract_state_info(line)
             if info:
                 timestamp, state, action, dur, power, energy = info
-                if action == 'start':
-                    current_states[state] = timestamp
-                elif action == 'end' and state in current_states:
-                    duration = timestamp - current_states[state]
-                    states[state].append(duration)
+                # if action == 'start':
+                #     current_states[state] = timestamp
+                # elif action == 'end' and state in current_states:
+                #     duration = timestamp - current_states[state]
+                #     states[state].append(duration)
+                #     states[state + ' duration'].append(dur)
+                #     states[state + ' power'].append(power)
+                #     states[state + ' energy'].append(energy)
+                #     del current_states[state]
+                if action == 'end':
                     states[state + ' duration'].append(dur)
                     states[state + ' power'].append(power)
                     states[state + ' energy'].append(energy)
-                    del current_states[state]
-
     return states
 
 # # Calculate statistics for each state
@@ -79,21 +83,21 @@ def process_log(filename):
 
 def calculate_stats(states):
     stats = {}
-    for state, durations in states.items():
+    for name, samples in states.items():
         # Convert to numpy array for easier calculations
-        durations_array = np.array(durations)
+        sample_array = np.array(samples)
         
         # Calculate initial mean and std
-        mean = np.mean(durations_array)
-        std = np.std(durations_array)
+        mean = np.mean(sample_array)
+        std = np.std(sample_array)
         
         # Calculate 1st and 99th percentiles
-        lower_threshold = np.percentile(durations_array, 1)
-        upper_threshold = np.percentile(durations_array, 99)
+        lower_threshold = np.percentile(sample_array, 1)
+        upper_threshold = np.percentile(sample_array, 99)
         
         # Filter out outliers
-        filtered_durations = durations_array[(durations_array >= lower_threshold) & 
-                                             (durations_array <= upper_threshold)]
+        filtered_durations = sample_array[(sample_array >= lower_threshold) & 
+                                             (sample_array <= upper_threshold)]
         
         # Recalculate mean and std deviation with filtered data
         if filtered_durations.size > 0:  # Check if there are any values left after filtering
@@ -104,7 +108,7 @@ def calculate_stats(states):
             mean_filtered = mean
             std_filtered = std
 
-        stats[state] = {
+        stats[name] = {
             'mean': mean_filtered, 
             'std': std_filtered, 
             'samples': filtered_durations.tolist()  # Convert back to list for consistency

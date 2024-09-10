@@ -150,7 +150,7 @@ class MyPlanning(Node):
         self.get_logger().info('Subscribe state (start)')
         self.meter.start(tag='Subscribe')
 
-    
+
     def get_power(self):
         sample = self.meter.get_trace()[0]
         energy = sum(sample.energy.values()) 
