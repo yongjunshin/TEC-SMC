@@ -10,6 +10,11 @@ import numpy as np
 from pyJoules.device import DeviceFactory
 from pyJoules.energy_meter import EnergyMeter
 
+import sys
+absolute_path = "/home/yjshin/Desktop/dev/TEC-SMC/cases/dummy_app/src/my_util"
+sys.path.append(absolute_path)
+import my_time
+
 class MyLocalization(Node):
 
     def __init__(self):
@@ -79,7 +84,7 @@ class MyLocalization(Node):
             self.get_logger().info('Processing state (start)')
             self.meter.start(tag='Processing')
             proc_latency = self.normal_latency(self.localization_proc_time_mean, self.localization_proc_time_std)
-            time.sleep(proc_latency)
+            my_time.wait(proc_latency)
             msg = String()
             msg.data = 'Lidar localization output ({0})'.format(Clock().now())
             self.meter.stop()
@@ -89,7 +94,7 @@ class MyLocalization(Node):
             self.get_logger().info('PreProcessing state (start)')
             self.meter.start(tag='PreProcessing')
             pre_latency = self.normal_latency(self.localization_pre_time_mean, self.localization_pre_time_std)
-            time.sleep(pre_latency)
+            my_time.wait(pre_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = self.get_power()
             self.get_logger().info('PreProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
@@ -97,7 +102,7 @@ class MyLocalization(Node):
             self.get_logger().info('Wait state (start)')
             self.meter.start(tag='Wait')
             wait_latency = self.normal_latency(self.localization_wait_time_mean, self.localization_wait_time_std)
-            time.sleep(wait_latency)
+            my_time.wait(wait_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = self.get_power()
             self.get_logger().info('Wait state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
@@ -105,7 +110,7 @@ class MyLocalization(Node):
             self.get_logger().info('PostProcessing state (start)')
             self.meter.start(tag='PostProcessing')
             post_latency = self.normal_latency(self.localization_post_time_mean, self.localization_post_time_std)
-            time.sleep(post_latency)
+            my_time.wait(post_latency)
             msg = String()
             msg.data = 'Lidar localization output ({0})'.format(Clock().now())
             self.meter.stop()

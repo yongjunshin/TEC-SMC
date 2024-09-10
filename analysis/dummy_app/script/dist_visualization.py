@@ -8,6 +8,10 @@ def normal_pdf(x, mean, std_dev):
     exponent = np.exp(-0.5 * ((x - mean) / std_dev) ** 2)
     return coefficient * exponent
 
+duration_dist_dict = {}
+duration_x_dict = {}
+mean_power_dict = {}
+
 def plot_state_distribution(ax, state_name, samples, mean, stddev):
     samples = np.array(samples)
     
@@ -21,11 +25,24 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
     ax_twin = ax.twinx()
     ax_twin.plot(x_values, normal_dist, 'r-', lw=2, label='Normal Distribution')
 
+    if "energy" in state_name.lower():
+        duration_str = state_name.replace('energy', 'duration')
+        power_str = state_name.replace('energy', 'power')
+        if (duration_str in duration_dist_dict) and (duration_str in duration_x_dict) and (power_str in mean_power_dict):
+            ax_twin2 = ax.twinx()
+            ax_twin2.plot(duration_x_dict[duration_str]*mean_power_dict[power_str], duration_dist_dict[duration_str], 'b-', lw=2, label='Prediction')
+            ax_twin2.set_ylim(bottom=0)
+            ax_twin2.set_yticks([])
+            ax_twin2.legend(loc='upper left', bbox_to_anchor=(1.09, 0.3), borderaxespad=0.)
+
 
     if "duration" in state_name.lower():
-        ax.set_xlabel('pyJoule duration (second)') 
+        ax.set_xlabel('pyJoule duration (second)')
+        duration_dist_dict[state_name] = normal_dist
+        duration_x_dict[state_name] = x_values
     elif "power" in state_name.lower():
         ax.set_xlabel('Power (micro watt)')  
+        mean_power_dict[state_name] = mean
     elif "energy" in state_name.lower():
         ax.set_xlabel('Energy (micro joule)')  
     else:
@@ -39,7 +56,7 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
 
     ax.legend(loc='upper left', bbox_to_anchor=(1.09, 1), borderaxespad=0.)
     ax_twin.legend(loc='upper left', bbox_to_anchor=(1.09, 0.65), borderaxespad=0.)
-
+    
     mean_std_text = f'Mean: {mean:.9f}\nStdDev: {stddev:.9f}'
     ax.text(1.1, 0.2, mean_std_text, transform=ax.transAxes, ha='left', va='top', fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
 
