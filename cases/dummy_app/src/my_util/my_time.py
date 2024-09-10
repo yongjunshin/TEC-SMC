@@ -8,4 +8,4 @@ def wait(duration):
     end_time = start_time + duration
     
     while time.time() < end_time:
-        pass  # This is an empty loop that does nothing
+        pass  # This is an empty loop that does nothing 
