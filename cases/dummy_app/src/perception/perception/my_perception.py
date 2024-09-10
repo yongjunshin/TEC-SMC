@@ -13,7 +13,7 @@ from pyJoules.energy_meter import EnergyMeter
 import sys
 absolute_path = "/home/yjshin/Desktop/dev/TEC-SMC/cases/dummy_app/src/my_util"
 sys.path.append(absolute_path)
-import my_time
+import my_time, my_random
 
 class MyPerception(Node):
 
@@ -104,7 +104,7 @@ class MyPerception(Node):
         if self.perception_split == 0:
             self.get_logger().info('Processing state (start)')
             self.meter.start(tag='Processing')
-            proc_latency = self.normal_latency(self.perception_proc_time_mean, self.perception_proc_time_std)
+            proc_latency = my_random.normal_latency(self.perception_proc_time_mean, self.perception_proc_time_std)
             my_time.wait(proc_latency)
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
@@ -114,7 +114,7 @@ class MyPerception(Node):
         else:
             self.get_logger().info('PreProcessing state (start)')
             self.meter.start(tag='PreProcessing')
-            pre_latency = self.normal_latency(self.perception_pre_time_mean, self.perception_pre_time_std)
+            pre_latency = my_random.normal_latency(self.perception_pre_time_mean, self.perception_pre_time_std)
             my_time.wait(pre_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = self.get_power()
@@ -122,7 +122,7 @@ class MyPerception(Node):
 
             self.get_logger().info('Wait state (start)')
             self.meter.start(tag='Wait')
-            wait_latency = self.normal_latency(self.perception_wait_time_mean, self.perception_wait_time_std)
+            wait_latency = my_random.normal_latency(self.perception_wait_time_mean, self.perception_wait_time_std)
             my_time.wait(wait_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = self.get_power()
@@ -130,7 +130,7 @@ class MyPerception(Node):
 
             self.get_logger().info('PostProcessing state (start)')
             self.meter.start(tag='PostProcessing')
-            post_latency = self.normal_latency(self.perception_post_time_mean, self.perception_post_time_std)
+            post_latency = my_random.normal_latency(self.perception_post_time_mean, self.perception_post_time_std)
             my_time.wait(post_latency)
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
@@ -144,12 +144,6 @@ class MyPerception(Node):
 
         self.get_logger().info('Subscribe state (start)')
         self.meter.start(tag='Subscribe')
-
-    def normal_latency(self, mean, stddev):
-        latency = np.random.normal(mean, stddev, 1)[0]
-        if latency < 0:
-            latency = 0
-        return latency
     
     def get_power(self):
         sample = self.meter.get_trace()[0]
