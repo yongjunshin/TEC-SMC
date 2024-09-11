@@ -50,37 +50,6 @@ def process_log(filename):
                     states[state + ' energy'].append(energy)
     return states
 
-# # Calculate statistics for each state
-# def calculate_stats(states):
-#     stats = {}
-#     for state, durations in states.items():
-#         mean = np.mean(durations)
-#         std = np.std(durations)
-
-#         # Calculate z-score for 99% confidence interval
-#         z_score = norm.ppf(0.995)  # 0.995 because it's a two-tailed test
-        
-#         # Determine the thresholds for the 95% confidence interval
-#         lower_threshold = mean - z_score * std
-#         upper_threshold = mean + z_score * std
-        
-#         # Filter out outliers
-#         filtered_durations = [x for x in durations if lower_threshold <= x <= upper_threshold]
-        
-#         # Recalculate mean and std deviation with filtered data
-#         if filtered_durations:  # Check if there are any values left after filtering
-#             filtered_array = np.array(filtered_durations)
-#             mean_filtered = np.mean(filtered_array)
-#             std_filtered = np.std(filtered_array)
-#         else:
-#             # Handle the case where no data remains after filtering
-#             mean_filtered = mean
-#             std_filtered = std
-
-#         stats[state] = {'mean': mean_filtered, 'std': std_filtered, 'samples': durations}
-
-#     return stats
-
 def calculate_stats(states):
     stats = {}
     for name, samples in states.items():
