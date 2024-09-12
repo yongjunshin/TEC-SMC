@@ -37,16 +37,16 @@ def plot_state_distribution(ax, state_name, samples, mean, stddev):
 
 
     if "duration" in state_name.lower():
-        ax.set_xlabel('pyJoule duration (second)')
+        ax.set_xlabel('pyJoule duration (ms)')
         duration_dist_dict[state_name] = normal_dist
         duration_x_dict[state_name] = x_values
     elif "power" in state_name.lower():
-        ax.set_xlabel('Power (micro watt)')  
+        ax.set_xlabel('Power (kW)')  
         mean_power_dict[state_name] = mean
     elif "energy" in state_name.lower():
-        ax.set_xlabel('Energy (micro joule)')  
+        ax.set_xlabel('Energy (J)')  
     else:
-        ax.set_xlabel('Staying time (second)')
+        ax.set_xlabel('Staying time (ms)')
         # duration_dist_dict[state_name + ' duration'] = normal_dist
         # duration_x_dict[state_name + ' duration'] = x_values
     ax.set_ylabel('Number of samples')
@@ -85,5 +85,5 @@ def visualize_from_csv(filename):
 
 # Example usage
 result_dir = 'analysis/dummy_app/results/'
-csv_filename = 'system_total_1_log_anal.csv'  # Replace with your actual CSV file
+csv_filename = 'system_total_0_log_anal.csv'  # Replace with your actual CSV file
 visualize_from_csv(result_dir + csv_filename)

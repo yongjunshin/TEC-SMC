@@ -5,4 +5,4 @@ def get_power(meter):
     energy = sum(sample.energy.values())    # micro Joules (uJ)
     energy = energy * 0.000001  # Joules (J)
     power = energy/duration     # killo Watt (kW)
-    return sample.tag, round(duration, 3), round(power, 3), round(energy, 3)   # ms, kW, J
+    return sample.tag, duration, power, energy   # ms, kW, J

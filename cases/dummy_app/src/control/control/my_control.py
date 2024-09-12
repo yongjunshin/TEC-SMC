@@ -101,7 +101,7 @@ class MyControl(Node):
     def publish_control_msg(self):
         self.meter.stop()
         energy_tag, duration, power, energy = my_power.get_power(self.meter)
-        self.get_logger().info('Subscribe state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+        self.get_logger().info('Subscribe state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
         if self.control_split == 0:
             self.get_logger().info('Processing state (start)')
@@ -117,7 +117,7 @@ class MyControl(Node):
                 msg.angular.z = 1.0
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)    
-            self.get_logger().info('Processing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('Processing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
         else:
             self.get_logger().info('PreProcessing state (start)')
             self.meter.start(tag='PreProcessing')
@@ -125,7 +125,7 @@ class MyControl(Node):
             my_time.wait(pre_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('PreProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('PreProcessing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('Wait state (start)')
             self.meter.start(tag='Wait')
@@ -133,7 +133,7 @@ class MyControl(Node):
             my_time.wait(wait_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('Wait state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('Wait state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('PostProcessing state (start)')
             self.meter.start(tag='PostProcessing')
@@ -148,7 +148,7 @@ class MyControl(Node):
                 msg.angular.z = 1.0
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('PostProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('PostProcessing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
         
         # self.get_logger().info('Publish state (start)')
         self.twist_publisher.publish(msg)

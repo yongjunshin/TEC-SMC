@@ -34,17 +34,17 @@ class MySensor(Node):
 
         self.sensor_sense_time_mean = self.get_parameter('sensor_sense_time_mean').value
 
-        self.get_logger().info('[PARAM] sensor_sense_time_mean: {0}'.format(self.sensor_sense_time_mean))
+        self.get_logger().info('[PARAM] sensor_sense_time_mean: {0:.6f}'.format(self.sensor_sense_time_mean))
 
 
     def publish_lidar_msg(self):
         msg = LaserScan()
         self.ladar_publisher.publish(msg)
-        # self.get_logger().info('Published lidar scan header: {0}'.format(msg.header))
+        # self.get_logger().info('Published lidar scan header: {0:.6f}'.format(msg.header))
 
         self.meter.stop()
         energy_tag, duration, power, energy = my_power.get_power(self.meter)
-        self.get_logger().info('Sense state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+        self.get_logger().info('Sense state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
         self.get_logger().info('Sense state (start)')
         self.meter.start(tag='Sense')
 

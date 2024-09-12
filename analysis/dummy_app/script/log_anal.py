@@ -44,7 +44,15 @@ def process_log(filename):
                 #     states[state + ' power'].append(power)
                 #     states[state + ' energy'].append(energy)
                 #     del current_states[state]
+                
+                    
                 if action == 'end':
+                    if (dur is None):
+                        print(dur)
+                    if (power is None):
+                        print(power)
+                    if (energy is None):
+                        print(energy)
                     states[state + ' duration'].append(dur)
                     states[state + ' power'].append(power)
                     states[state + ' energy'].append(energy)
@@ -78,8 +86,8 @@ def calculate_stats(states):
             std_filtered = std
 
         stats[name] = {
-            'mean': mean_filtered, 
-            'std': std_filtered, 
+            'mean': round(mean_filtered, 3), 
+            'std': round(std_filtered, 3), 
             'samples': filtered_durations.tolist()  # Convert back to list for consistency
         }
 

@@ -59,15 +59,15 @@ class MyLocalization(Node):
         self.localization_post_time_mean = self.get_parameter('localization_post_time_mean').value
         self.localization_post_time_std = self.get_parameter('localization_post_time_std').value
 
-        self.get_logger().info('[PARAM] localization_split: {0}'.format(self.localization_split))
-        self.get_logger().info('[PARAM] localization_proc_time_mean: {0}'.format(self.localization_proc_time_mean))
-        self.get_logger().info('[PARAM] localization_proc_time_std: {0}'.format(self.localization_proc_time_std))
-        self.get_logger().info('[PARAM] localization_pre_time_mean: {0}'.format(self.localization_pre_time_mean))
-        self.get_logger().info('[PARAM] localization_pre_time_std: {0}'.format(self.localization_pre_time_std))
-        self.get_logger().info('[PARAM] localization_wait_time_mean: {0}'.format(self.localization_wait_time_mean))
-        self.get_logger().info('[PARAM] localization_wait_time_std: {0}'.format(self.localization_wait_time_std))
-        self.get_logger().info('[PARAM] localization_post_time_mean: {0}'.format(self.localization_post_time_mean))
-        self.get_logger().info('[PARAM] localization_post_time_std: {0}'.format(self.localization_post_time_std))
+        self.get_logger().info('[PARAM] localization_split: {0:.6f}'.format(self.localization_split))
+        self.get_logger().info('[PARAM] localization_proc_time_mean: {0:.6f}'.format(self.localization_proc_time_mean))
+        self.get_logger().info('[PARAM] localization_proc_time_std: {0:.6f}'.format(self.localization_proc_time_std))
+        self.get_logger().info('[PARAM] localization_pre_time_mean: {0:.6f}'.format(self.localization_pre_time_mean))
+        self.get_logger().info('[PARAM] localization_pre_time_std: {0:.6f}'.format(self.localization_pre_time_std))
+        self.get_logger().info('[PARAM] localization_wait_time_mean: {0:.6f}'.format(self.localization_wait_time_mean))
+        self.get_logger().info('[PARAM] localization_wait_time_std: {0:.6f}'.format(self.localization_wait_time_std))
+        self.get_logger().info('[PARAM] localization_post_time_mean: {0:.6f}'.format(self.localization_post_time_mean))
+        self.get_logger().info('[PARAM] localization_post_time_std: {0:.6f}'.format(self.localization_post_time_std))
 
 
     def subscribe_lidar_message(self, msg):
@@ -78,7 +78,7 @@ class MyLocalization(Node):
     def publish_lidar_localization_output_msg(self):
         self.meter.stop()
         energy_tag, duration, power, energy = my_power.get_power(self.meter)
-        self.get_logger().info('Subscribe state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+        self.get_logger().info('Subscribe state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
         if self.localization_split == 0:
             self.get_logger().info('Processing state (start)')
@@ -89,7 +89,7 @@ class MyLocalization(Node):
             msg.data = 'Lidar localization output ({0})'.format(Clock().now())
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('Processing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('Processing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
         else:
             self.get_logger().info('PreProcessing state (start)')
             self.meter.start(tag='PreProcessing')
@@ -97,7 +97,7 @@ class MyLocalization(Node):
             my_time.wait(pre_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('PreProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('PreProcessing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('Wait state (start)')
             self.meter.start(tag='Wait')
@@ -105,7 +105,7 @@ class MyLocalization(Node):
             my_time.wait(wait_latency)
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('Wait state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('Wait state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('PostProcessing state (start)')
             self.meter.start(tag='PostProcessing')
@@ -115,7 +115,7 @@ class MyLocalization(Node):
             msg.data = 'Lidar localization output ({0})'.format(Clock().now())
             self.meter.stop()
             energy_tag, duration, power, energy = my_power.get_power(self.meter)
-            self.get_logger().info('PostProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
+            self.get_logger().info('PostProcessing state (end) ({0} duration:{1:.6f}) ({0} power:{2:.6f}) ({0} energy:{3:.6f})'.format(energy_tag, duration, power, energy))
         
         # self.get_logger().info('Publish state (start)')
         self.localization_output_publisher.publish(msg)

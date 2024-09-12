@@ -42,7 +42,7 @@ def normal_pdf(x, mean, std_dev):
 
 # profiler user setting
 profiling_duration = 0.1    # seconds
-num_power_samples = 200
+num_power_samples = 500
 outlier_percentail = 5  # confidence interval = 100 - (2 * outlier_percentail)
 
 
@@ -64,16 +64,17 @@ trace = unit_meter.get_trace()
 power_hist = []
 for i in range(num_power_samples):
     sample = trace[i]
-    total_energy = sum(sample.energy.values())
-    total_power = total_energy / sample.duration
-    power_hist.append(total_power)
-    # print(i+1, 'th sample power: ', total_power, ', sample duration: ', sample.duration)
+    duration = sample.duration * 1000 
+    energy = sum(sample.energy.values()) * 0.000001
+    power = energy / duration
+    power_hist.append(power)
+    # print(i+1, 'th sample power: ', power, ', sample duration: ', duration)
 # print('power samples: ', power_hist)
 
 mission_sample = mission_meter.get_trace()[0]
-mission_energy = sum(mission_sample.energy.values())
-mission_power = mission_energy / mission_sample.duration
-print('mission power      : ', mission_power, ', mission duration: ', mission_sample.duration, ', mission energy: ', mission_energy)
+mission_energy = sum(mission_sample.energy.values()) * 0.000001
+mission_power = mission_energy / (mission_sample.duration * 1000)
+print('mission power      : ', round(mission_power, 3), ', mission duration: ', round(mission_sample.duration, 3), ', mission energy: ', round(mission_energy, 3))
 
 # analysis
 hist_range_min = np.min(power_hist)
@@ -88,8 +89,8 @@ normal_dist = normal_pdf(x_values, mean_power, std_power)
 
 
 # report
-print('filtered power mean: ', np.mean(filtered_power_hist))
-print('filtered power std : ', np.std(filtered_power_hist))
+print('filtered power mean: ', round(np.mean(filtered_power_hist), 3))
+print('filtered power std : ', round(np.std(filtered_power_hist), 3))
 
 plt.hist(power_hist, bins=100, edgecolor='white', range=(hist_range_min, hist_range_max))   # plotting before outlier extraction
 plt.hist(filtered_power_hist, bins=100, edgecolor='black', range=(hist_range_min, hist_range_max))
