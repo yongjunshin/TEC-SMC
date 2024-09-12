@@ -105,7 +105,7 @@ def write_csv(stats, filename):
 
 # Main execution
 log_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/data/'
-log_name = 'system_total_0_log'
+log_name = 'system_total_1_log'
 result_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/results/'
 
 log_filename = log_dir + log_name + '.txt'

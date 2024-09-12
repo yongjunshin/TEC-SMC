@@ -13,7 +13,7 @@ from pyJoules.energy_meter import EnergyMeter
 import sys
 absolute_path = "/home/yjshin/Desktop/dev/TEC-SMC/cases/dummy_app/src/my_util"
 sys.path.append(absolute_path)
-import my_time, my_random
+import my_time, my_random, my_power
 
 class MyPerception(Node):
 
@@ -98,7 +98,7 @@ class MyPerception(Node):
             
     def publish_lidar_perception_output_msg(self):
         self.meter.stop()
-        energy_tag, duration, power, energy = self.get_power()
+        energy_tag, duration, power, energy = my_power.get_power(self.meter)
         self.get_logger().info('Subscribe state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
         if self.perception_split == 0:
@@ -109,7 +109,7 @@ class MyPerception(Node):
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
             self.meter.stop()
-            energy_tag, duration, power, energy = self.get_power()
+            energy_tag, duration, power, energy = my_power.get_power(self.meter)
             self.get_logger().info('Processing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
         else:
             self.get_logger().info('PreProcessing state (start)')
@@ -117,7 +117,7 @@ class MyPerception(Node):
             pre_latency = my_random.normal_latency(self.perception_pre_time_mean, self.perception_pre_time_std)
             my_time.wait(pre_latency)
             self.meter.stop()
-            energy_tag, duration, power, energy = self.get_power()
+            energy_tag, duration, power, energy = my_power.get_power(self.meter)
             self.get_logger().info('PreProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('Wait state (start)')
@@ -125,7 +125,7 @@ class MyPerception(Node):
             wait_latency = my_random.normal_latency(self.perception_wait_time_mean, self.perception_wait_time_std)
             my_time.wait(wait_latency)
             self.meter.stop()
-            energy_tag, duration, power, energy = self.get_power()
+            energy_tag, duration, power, energy = my_power.get_power(self.meter)
             self.get_logger().info('Wait state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
             self.get_logger().info('PostProcessing state (start)')
@@ -135,7 +135,7 @@ class MyPerception(Node):
             msg = String()
             msg.data = 'Lidar perception output ({0})'.format(Clock().now())
             self.meter.stop()
-            energy_tag, duration, power, energy = self.get_power()
+            energy_tag, duration, power, energy = my_power.get_power(self.meter)
             self.get_logger().info('PostProcessing state (end) ({0} duration:{1}) ({0} power:{2}) ({0} energy:{3})'.format(energy_tag, duration, power, energy))
 
         # self.get_logger().info('Publish state (start)')
@@ -144,12 +144,6 @@ class MyPerception(Node):
 
         self.get_logger().info('Subscribe state (start)')
         self.meter.start(tag='Subscribe')
-    
-    def get_power(self):
-        sample = self.meter.get_trace()[0]
-        energy = sum(sample.energy.values()) 
-        power = energy/sample.duration
-        return sample.tag, sample.duration, power, energy
 
 def main(args=None):
     rclpy.init(args=args)
