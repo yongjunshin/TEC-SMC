@@ -86,8 +86,8 @@ def calculate_stats(states):
             std_filtered = std
 
         stats[name] = {
-            'mean': round(mean_filtered, 3), 
-            'std': round(std_filtered, 3), 
+            'mean': round(mean_filtered, 6), 
+            'std': round(std_filtered, 6), 
             'samples': filtered_durations.tolist()  # Convert back to list for consistency
         }
 
@@ -113,7 +113,7 @@ def write_csv(stats, filename):
 
 # Main execution
 log_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/data/'
-log_name = 'system_total_1_log'
+log_name = 'system_total_0_log'
 result_dir = '/home/yjshin/Desktop/dev/TEC-SMC/analysis/dummy_app/results/'
 
 log_filename = log_dir + log_name + '.txt'

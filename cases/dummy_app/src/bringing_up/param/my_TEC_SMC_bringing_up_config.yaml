@@ -4,7 +4,7 @@
     sensor_sense_time_mean: 0.02
 
     # localization
-    localization_split: 1
+    localization_split: 0
     localization_proc_time_mean: 0.02
     localization_proc_time_std: 0.002
     localization_pre_time_mean: 0.01
@@ -15,7 +15,7 @@
     localization_post_time_std: 0.001
 
     # perception
-    perception_split: 1
+    perception_split: 0
     perception_proc_time_mean: 0.2
     perception_proc_time_std: 0.02
     perception_pre_time_mean: 0.01
@@ -26,7 +26,7 @@
     perception_post_time_std: 0.001
 
     # planning
-    planning_split: 1
+    planning_split: 0
     planning_proc_time_mean: 0.1
     planning_proc_time_std: 0.01
     planning_pre_time_mean: 0.01
@@ -37,7 +37,7 @@
     planning_post_time_std: 0.001
 
     # control
-    control_split: 1
+    control_split: 0
     control_proc_time_mean: 0.02
     control_proc_time_std: 0.002
     control_pre_time_mean: 0.01
