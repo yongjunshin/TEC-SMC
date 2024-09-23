@@ -3,3 +3,4 @@ matplotlib
 pyJoules
 pynvml
 scipy
+PyYAML

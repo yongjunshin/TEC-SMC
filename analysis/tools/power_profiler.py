@@ -74,7 +74,7 @@ for i in range(num_power_samples):
 mission_sample = mission_meter.get_trace()[0]
 mission_energy = sum(mission_sample.energy.values()) * 0.000000001
 mission_power = mission_energy / (mission_sample.duration)
-print('mission power      : ', round(mission_power, 6), ', mission duration: ', round(mission_sample.duration, 6), ', mission energy: ', round(mission_energy, 6))
+# print('mission power      : ', round(mission_power, 6), ', mission duration: ', round(mission_sample.duration, 6), ', mission energy: ', round(mission_energy, 6))
 
 # analysis
 hist_range_min = np.min(power_hist)
@@ -89,8 +89,9 @@ normal_dist = normal_pdf(x_values, mean_power, std_power)
 
 
 # report
-print('filtered power mean: ', round(np.mean(filtered_power_hist), 6))
-print('filtered power std : ', round(np.std(filtered_power_hist), 6))
+print('powerMin:', round(np.mean(filtered_power_hist), 6))
+print('powerStd:', round(np.std(filtered_power_hist), 6))
+print('powerProfilingDur:', profiling_duration)
 
 plt.hist(power_hist, bins=100, edgecolor='white', range=(hist_range_min, hist_range_max))   # plotting before outlier extraction
 plt.hist(filtered_power_hist, bins=100, edgecolor='black', range=(hist_range_min, hist_range_max))

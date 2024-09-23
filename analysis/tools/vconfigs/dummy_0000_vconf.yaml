@@ -1,0 +1,28 @@
+# SMC Verification Program Configuration
+
+# Application details
+appName: "dummy_app"
+config: "0000"
+logDir: "analysis/dummy_app/data"
+sensor: "my_sensor"
+actuator: "my_vehicle_interface"
+
+# SMC parameters
+numSample: 5
+timeBound: 10.0
+confLevel: 0.95
+
+# Requirement bounds
+latency: 0.1
+coldLatency: 0.4
+energy: 2.04
+cost: 5.0
+
+# Power profile
+powerMean: 0.204175
+powerStd: 0.005295
+powerProfilingDur: 0.1
+
+# Verification results
+resultSave: true
+resultSaveDir: "analysis/dummy_app/results"
