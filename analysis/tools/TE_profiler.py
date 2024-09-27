@@ -11,7 +11,7 @@ import csv
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="SMC Verification Program")
+    parser = argparse.ArgumentParser(description="TE profiler")
     parser.add_argument("-logDir", type=str, required=True, help="Path to the log file directory")
     parser.add_argument("-appName", type=str, required=True, help="Application name")
     parser.add_argument("-config", type=str, required=True, help="Configuration ID of the application")
@@ -25,9 +25,9 @@ def parse_arguments():
 
 
 def print_parameters(args):
-    print("Verification Configuration")
+    print("TE Profiler Configuration")
     for arg, value in vars(args).items():
-        print(f"{arg}: {value}")
+        print(f"-{arg}: {value}")
     print()
 
 
@@ -82,7 +82,7 @@ def write_time_profile_csv(latency_profile, latency_samples, filename):
                 padding_size = max_samples - len(samples_list)
                 padded_samples = samples_list + [''] * padding_size
                 row = [node, state, mean, std] + padded_samples
-                print([node, state, mean, std])
+                # print([node, state, mean, std])
                 writer.writerow(row)
 
 def write_energy_profile_csv(power_profile, power_samples, filename):
@@ -95,7 +95,7 @@ def write_energy_profile_csv(power_profile, power_samples, filename):
 
         mean, std = power_profile
         row = ['System', 'Power', mean, std] + power_samples.tolist()
-        print([mean, std])
+        # print([mean, std])
         writer.writerow(row)
 
 
@@ -114,7 +114,7 @@ def main():
     for i in range(num_logs):
         log_idx = i + 1
         file_name = f"{args.logDir}/{args.appName}_{args.config}_{log_idx}_log.txt"
-        print(file_name)
+        print(f"-{file_name}")
         try:
             with open(file_name, 'r') as file:
                 for line in file:
@@ -149,13 +149,14 @@ def main():
             latency_std = np.std(latency_samples[node][state])
             latency_profiles[node][state] = (latency_mean, latency_std)
 
+    # Time profiling
     time_profile_file_name = f"{args.resultDir}/{args.appName}_{args.config}_Tprofile.csv"
     write_time_profile_csv(latency_profiles, latency_samples, time_profile_file_name)
 
     # power profiling
     total_power_samples_array = outlier_extraction(np.array(total_power_samples), args.outlierPercentail)
     power_profile = (np.mean(total_power_samples_array), np.std(total_power_samples_array))
-    print()
+    # print()
 
     time_profile_file_name = f"{args.resultDir}/{args.appName}_{args.config}_Eprofile.csv"
     write_energy_profile_csv(power_profile, total_power_samples_array, time_profile_file_name)

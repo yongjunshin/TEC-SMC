@@ -77,7 +77,6 @@ def check_log_files(log_dir, app_name, config, num_samples):
             print(f"Error: Missing log file {filename}")
             sys.exit(1)
     print(f"All {num_samples} log files found.")
-    print()
 
 
 def evaluate_sample(sample_log_filename, args):
@@ -104,7 +103,7 @@ def evaluate_sample(sample_log_filename, args):
             "p11": checker_p11(total_cost, args.cost),
             "p12": checker_p12(total_cost)
         }
-        print(f"{sample_log_filename}: {evaluation_results}")
+        # print(f"{sample_log_filename}: {evaluation_results}")
         
         return evaluation_results
     except FileNotFoundError:
@@ -156,9 +155,11 @@ def verify_samples(evaluation_result_list, conf_level):
     
     # Now calculate confidence intervals for each property
     confidence_intervals = {}
+    samples = {}
     
     for key, values in property_results.items():
         # Convert the list of values to a numpy array and handle boolean values
+        samples[key] = values
         np_values = np.array(values)
 
         # if np_values.dtype == 'bool':  # Convert boolean values to integers
@@ -170,10 +171,10 @@ def verify_samples(evaluation_result_list, conf_level):
         # Store the result in the dictionary
         confidence_intervals[key] = (p_hat, lower_bound, upper_bound, epsilon)
     
-    return confidence_intervals
+    return confidence_intervals, samples
 
 
-def save_verification_result(verification_result, args):
+def save_verification_result(verification_result, prop_eval_samples, args):
     # Initialize an empty list to collect the output lines
     output_lines = []
 
@@ -187,16 +188,21 @@ def save_verification_result(verification_result, args):
         elif property_name in ['p2', 'p5', 'p8', 'p11']:
             # For properties p2, p5, p8, p11, calculate mean of bounds
             mean_value = (lower_bound + upper_bound) / 2
-            output_lines.append(f"{property_name}: {mean_value:.1f}")
+            output_lines.append(f"{property_name}: {mean_value:.6f}")
         
         elif property_name in ['p3', 'p6', 'p9', 'p12']:
             # For properties p3, p6, p9, p12, print bounds
-            output_lines.append(f"{property_name}: ({lower_bound:.1f}, {upper_bound:.1f})")
+            output_lines.append(f"{property_name}: ({lower_bound:.6f}, {upper_bound:.6f})")
 
     # Print all results
     print("Statistical verification results")
     for line in output_lines:
         print(line)
+    print()
+
+    # Iterate over the verification results
+    for property_name, samples in prop_eval_samples.items():        
+        output_lines.append(f"{property_name} samples: {samples}")
 
     # Save the results to a file if specified
     if args.resultSave:
@@ -220,7 +226,7 @@ def main():
     
     evaluation_result_list = []
     
-    print("Log sample property evaluation results")
+    # print("Log sample property evaluation results")
     for trial_num in range(1, args.numSample + 1):
         sample_log_filename = f"{args.appName}_{args.config}_{trial_num}_log.txt"
         sample_log_path = os.path.join(args.logDir, sample_log_filename)
@@ -229,8 +235,8 @@ def main():
         evaluation_result_list.append(sample_evaluation_result)
     print()
 
-    statistical_verification_result = verify_samples(evaluation_result_list, args.confLevel)
-    save_verification_result(statistical_verification_result, args)
+    statistical_verification_result, prop_eval_samples = verify_samples(evaluation_result_list, args.confLevel)
+    save_verification_result(statistical_verification_result, prop_eval_samples, args)
 
 
 if __name__ == "__main__":

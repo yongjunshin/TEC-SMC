@@ -3,7 +3,7 @@
 # Application details
 appName: "dummy_app"
 config: "0000"
-logDir: "analysis/dummy_app/data"
+logDir: "analysis/dummy_app/logs"
 sensor: "my_sensor"
 actuator: "my_vehicle_interface"
 
@@ -15,8 +15,8 @@ confLevel: 0.95
 # Requirement bounds
 latency: 0.1
 coldLatency: 0.4
-energy: 2.04
-cost: 5.0
+energy: 2.4
+cost: 2000.0
 
 # Power profile
 powerMean: 0.204175

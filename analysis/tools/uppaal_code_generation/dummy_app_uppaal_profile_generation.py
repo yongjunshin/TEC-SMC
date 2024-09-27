@@ -111,6 +111,8 @@ def main():
     parser.add_argument('-tprofile', required=True, help='Path to the T profile CSV file.')
     parser.add_argument('-eprofile', required=True, help='Path to the E profile CSV file.')
     parser.add_argument('-powerDur', type=float, required=True, help='Power duration value.')
+    parser.add_argument('-config', required=True, help='Profile configuration.')
+
     
     args = parser.parse_args()
 
@@ -131,7 +133,7 @@ def main():
     modified_content = replace_variables(template_content, variables)
 
     # Write the modified content to an output file
-    output_path = os.path.splitext(args.template)[0] + '_generated.c'  # Create output filename
+    output_path = os.path.splitext(args.template)[0] + '_' + args.config + '_generated.c'  # Create output filename
     write_output(output_path, modified_content)
 
     print(f"Profile generation complete. Output written to: {output_path}")

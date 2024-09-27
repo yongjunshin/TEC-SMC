@@ -1,27 +1,27 @@
 /**: # namespace and node name (double stars means 'ignore')
   ros__parameters:
     # sensor
-    sensor_sense_time_mean: 0.02
+    sensor_sense_time_mean: 0.05
 
     # localization
     localization_split: 0
-    localization_proc_time_mean: 0.02
-    localization_proc_time_std: 0.002
+    localization_proc_time_mean: 0.1
+    localization_proc_time_std: 0.05
     localization_pre_time_mean: 0.01
     localization_pre_time_std: 0.001
-    localization_wait_time_mean: 0.01
-    localization_wait_time_std: 0.001
+    localization_wait_time_mean: 0.05
+    localization_wait_time_std: 0.01
     localization_post_time_mean: 0.01
     localization_post_time_std: 0.001
 
     # perception
     perception_split: 0
     perception_proc_time_mean: 0.2
-    perception_proc_time_std: 0.02
+    perception_proc_time_std: 0.05
     perception_pre_time_mean: 0.01
     perception_pre_time_std: 0.001
-    perception_wait_time_mean: 0.1
-    perception_wait_time_std: 0.001
+    perception_wait_time_mean: 0.05
+    perception_wait_time_std: 0.01
     perception_post_time_mean: 0.01
     perception_post_time_std: 0.001
 
@@ -32,7 +32,7 @@
     planning_pre_time_mean: 0.01
     planning_pre_time_std: 0.001
     planning_wait_time_mean: 0.05
-    planning_wait_time_std: 0.005
+    planning_wait_time_std: 0.01
     planning_post_time_mean: 0.01
     planning_post_time_std: 0.001
 
@@ -42,8 +42,8 @@
     control_proc_time_std: 0.002
     control_pre_time_mean: 0.01
     control_pre_time_std: 0.001
-    control_wait_time_mean: 0.01
-    control_wait_time_std: 0.001
+    control_wait_time_mean: 0.05
+    control_wait_time_std: 0.01
     control_post_time_mean: 0.01
     control_post_time_std: 0.001
 
