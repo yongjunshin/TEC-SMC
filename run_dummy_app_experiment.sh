@@ -38,7 +38,7 @@ sleep 1
 
 for idx in $(seq 1 $num_experiments); do
     log_file="analysis/dummy_app/logs/dummy_app_${config}_${idx}_log.txt"
-    exec setsid ros2 launch bringing_up my_TEC_SMC_bringing_up.launch.py > "$log_file" 2>&1 &
+    exec ros2 launch bringing_up my_TEC_SMC_bringing_up.launch.py > "$log_file" 2>&1 &
     sleep 1
 
     # ps -o pid,pgid,sid,cmd -e | grep -E "ros2|my_"
